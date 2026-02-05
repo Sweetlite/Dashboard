@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 I_Trade_it - Dashboard n8n</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        
+        .config-section {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .config-section label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .config-section input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        
+        .config-section input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+        
+        .config-section .hint {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+        
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .workflow-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .workflow-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0,212,255,0.3);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .workflow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .workflow-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .workflow-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .workflow-id {
+            font-size: 0.75rem;
+            color: #666;
+            font-family: monospace;
+        }
+        
+        .workflow-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-idle {
+            background: rgba(255,255,255,0.1);
+            color: #888;
+        }
+        
+        .status-running {
+            background: rgba(255,193,7,0.2);
+            color: #ffc107;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-success {
+            background: rgba(76,175,80,0.2);
+            color: #4caf50;
+        }
+        
+        .status-error {
+            background: rgba(244,67,54,0.2);
+            color: #f44336;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .workflow-schedule {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+        
+        .workflow-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-execute {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #fff;
+        }
+        
+        .btn-execute:hover {
+            background: linear-gradient(135deg, #00e5ff, #00b8d4);
+            transform: scale(1.02);
+        }
+        
+        .btn-execute:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-open {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            flex: 0.4;
+        }
+        
+        .btn-open:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .execution-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        .execution-info .time {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .execution-info .duration {
+            color: #00d4ff;
+        }
+        
+        .run-all-section {
+            max-width: 600px;
+            margin: 30px auto;
+            text-align: center;
+        }
+        
+        .btn-run-all {
+            background: linear-gradient(135deg, #7b2cbf, #9c27b0);
+            color: #fff;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+        }
+        
+        .btn-run-all:hover {
+            background: linear-gradient(135deg, #9c27b0, #ab47bc);
+        }
+        
+        .history-section {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .history-section h2 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .history-item .name {
+            font-weight: 500;
+        }
+        
+        .history-item .time {
+            color: #888;
+            font-size: 0.85rem;
+        }
+        
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast.success {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+        }
+        
+        .toast.error {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+        
+        .error-details {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(244,67,54,0.1);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #f44336;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 I_Trade_it Dashboard</h1>
+        <p>Contrôle et monitoring des workflows n8n</p>
+    </div>
+    
+    <div class="config-section">
+        <label for="apiKey">🔑 Clé API n8n</label>
+        <input type="password" id="apiKey" placeholder="Entrez votre clé API n8n..." />
+        <p class="hint">Créez une clé API dans n8n : Settings → API → Create API Key</p>
+        
+        <label for="n8nUrl">🌐 URL n8n</label>
+        <input type="text" id="n8nUrl" value="https://n8n.srv1230871.hstgr.cloud" />
+    </div>
+    
+    <div class="dashboard" id="dashboard">
+        <!-- Les cartes seront générées dynamiquement -->
+    </div>
+    
+    <div class="run-all-section">
+        <button class="btn btn-run-all" onclick="runAllWorkflows()">
+            ⚡ Exécuter tous les workflows
+        </button>
+    </div>
+    
+    <div class="history-section">
+        <h2>📜 Historique des exécutions</h2>
+        <div class="history-list" id="historyList">
+            <p style="color: #666; text-align: center;">Aucune exécution pour le moment</p>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Configuration des workflows
+        const workflows = [
+            {
+                id: 'VpgJdXUofsw9nNYk',
+                name: 'MAJ Positions Actives',
+                icon: '📊',
+                schedule: '18h30 (après clôture)',
+                description: 'Met à jour les prix et P&L des positions ouvertes'
+            },
+            {
+                id: 'HG8ZxyeibxJBhpCL',
+                name: 'Morning Brief',
+                icon: '🌅',
+                schedule: '08h00',
+                description: 'Brief matinal avec news, météo et calendrier'
+            },
+            {
+                id: '8T0qru8eYnuoXU6V',
+                name: 'Screening Daily',
+                icon: '📈',
+                schedule: '18h / 18h20 / 22h15',
+                description: 'Analyse technique CAC40, SBF120, S&P500'
+            },
+            {
+                id: 'Et9qUyNQA6HYBLBE',
+                name: 'WF1 Screening',
+                icon: '🎯',
+                schedule: '07h00',
+                description: 'Screening et scoring des valeurs'
+            },
+            {
+                id: '9e1YXzT5Eh7kl2Du',
+                name: 'WF2 Analyse Signaux',
+                icon: '🤖',
+                schedule: '08h00',
+                description: 'Analyse IA des meilleurs candidats'
+            }
+        ];
+
+        // État des workflows
+        const workflowStates = {};
+        const executionHistory = [];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Charger la config sauvegardée
+            const savedApiKey = localStorage.getItem('n8n_api_key');
+            const savedUrl = localStorage.getItem('n8n_url');
+            
+            if (savedApiKey) document.getElementById('apiKey').value = savedApiKey;
+            if (savedUrl) document.getElementById('n8nUrl').value = savedUrl;
+            
+            // Sauvegarder la config quand elle change
+            document.getElementById('apiKey').addEventListener('change', saveConfig);
+            document.getElementById('n8nUrl').addEventListener('change', saveConfig);
+            
+            // Générer les cartes
+            renderWorkflows();
+        });
+
+        function saveConfig() {
+            localStorage.setItem('n8n_api_key', document.getElementById('apiKey').value);
+            localStorage.setItem('n8n_url', document.getElementById('n8nUrl').value);
+        }
+
+        function renderWorkflows() {
+            const dashboard = document.getElementById('dashboard');
+            dashboard.innerHTML = workflows.map(wf => `
+                <div class="workflow-card" id="card-${wf.id}">
+                    <div class="workflow-header">
+                        <div>
+                            <div class="workflow-icon">${wf.icon}</div>
+                            <div class="workflow-name">${wf.name}</div>
+                            <div class="workflow-id">${wf.id}</div>
+                        </div>
+                        <div class="workflow-status status-idle" id="status-${wf.id}">
+                            <span>●</span> Prêt
+                        </div>
+                    </div>
+                    <div class="workflow-schedule">
+                        <span>⏰</span> ${wf.schedule}
+                    </div>
+                    <div class="workflow-actions">
+                        <button class="btn btn-execute" id="btn-${wf.id}" onclick="executeWorkflow('${wf.id}')">
+                            ▶️ Exécuter
+                        </button>
+                        <button class="btn btn-open" onclick="openWorkflow('${wf.id}')">
+                            🔗
+                        </button>
+                    </div>
+                    <div class="execution-info" id="info-${wf.id}" style="display: none;">
+                        <div class="time">
+                            <span>Dernière exécution:</span>
+                            <span id="lastRun-${wf.id}">-</span>
+                        </div>
+                        <div class="time">
+                            <span>Durée:</span>
+                            <span class="duration" id="duration-${wf.id}">-</span>
+                        </div>
+                    </div>
+                    <div class="error-details" id="error-${wf.id}"></div>
+                </div>
+            `).join('');
+        }
+
+        async function executeWorkflow(workflowId) {
+            const apiKey = document.getElementById('apiKey').value;
+            const n8nUrl = document.getElementById('n8nUrl').value.replace(/\/$/, ''); // Enlever le slash final
+            
+            if (!apiKey) {
+                showToast('Veuillez entrer votre clé API n8n', 'error');
+                return;
+            }
+            
+            const workflow = workflows.find(w => w.id === workflowId);
+            const btn = document.getElementById(`btn-${workflowId}`);
+            const status = document.getElementById(`status-${workflowId}`);
+            const info = document.getElementById(`info-${workflowId}`);
+            const errorDiv = document.getElementById(`error-${workflowId}`);
+            
+            // Reset error
+            errorDiv.style.display = 'none';
+            
+            // État: En cours
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div> Exécution...';
+            status.className = 'workflow-status status-running';
+            status.innerHTML = '<div class="spinner"></div> En cours';
+            
+            const startTime = Date.now();
+            
+            try {
+                // Utiliser l'endpoint correct pour exécuter un workflow via l'API n8n
+                // POST /api/v1/executions avec le workflowId dans le body
+                const response = await fetch(`${n8nUrl}/api/v1/executions`, {
+                    method: 'POST',
+                    headers: {
+                        'X-N8N-API-KEY': apiKey,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        workflowId: workflowId
+                    })
+                });
+                
+                const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // Succès
+                    status.className = 'workflow-status status-success';
+                    status.innerHTML = '<span>✓</span> Succès';
+                    showToast(`${workflow.icon} ${workflow.name} exécuté avec succès!`, 'success');
+                    
+                    addToHistory(workflow, 'success', duration);
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `Erreur HTTP ${response.status}`);
+                }
+                
+                // Afficher les infos
+                info.style.display = 'block';
+                document.getElementById(`lastRun-${workflowId}`).textContent = new Date().toLocaleTimeString('fr-FR');
+                document.getElementById(`duration-${workflowId}`).textContent = `${duration}s`;
+                
+            } catch (error) {
+                // Erreur
+                status.className = 'workflow-status status-error';
+                status.innerHTML = '<span>✗</span> Échec';
+                showToast(`Erreur: ${error.message}`, 'error');
+                
+                // Afficher les détails de l'erreur
+                errorDiv.textContent = `Erreur: ${error.message}`;
+                errorDiv.style.display = 'block';
+                
+                const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+                addToHistory(workflow, 'error', duration);
+                
+                info.style.display = 'block';
+                document.getElementById(`lastRun-${workflowId}`).textContent = new Date().toLocaleTimeString('fr-FR');
+                document.getElementById(`duration-${workflowId}`).textContent = `${duration}s`;
+            }
+            
+            // Réactiver le bouton
+            btn.disabled = false;
+            btn.innerHTML = '▶️ Exécuter';
+            
+            // Reset le statut après 30 secondes
+            setTimeout(() => {
+                if (status.classList.contains('status-success') || status.classList.contains('status-error')) {
+                    status.className = 'workflow-status status-idle';
+                    status.innerHTML = '<span>●</span> Prêt';
+                }
+            }, 30000);
+        }
+
+        function openWorkflow(workflowId) {
+            const n8nUrl = document.getElementById('n8nUrl').value;
+            window.open(`${n8nUrl}/workflow/${workflowId}`, '_blank');
+        }
+
+        async function runAllWorkflows() {
+            const confirmation = confirm('Êtes-vous sûr de vouloir exécuter tous les workflows ?');
+            if (!confirmation) return;
+            
+            for (const wf of workflows) {
+                await executeWorkflow(wf.id);
+                // Petite pause entre chaque workflow
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+
+        function addToHistory(workflow, status, duration) {
+            const historyList = document.getElementById('historyList');
+            
+            // Supprimer le message "aucune exécution" s'il existe
+            if (executionHistory.length === 0) {
+                historyList.innerHTML = '';
+            }
+            
+            const entry = {
+                workflow,
+                status,
+                duration,
+                time: new Date()
+            };
+            
+            executionHistory.unshift(entry);
+            
+            // Limiter l'historique à 20 entrées
+            if (executionHistory.length > 20) {
+                executionHistory.pop();
+            }
+            
+            // Re-render l'historique
+            historyList.innerHTML = executionHistory.map(e => `
+                <div class="history-item">
+                    <div>
+                        <span class="name">${e.workflow.icon} ${e.workflow.name}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="time">${e.time.toLocaleTimeString('fr-FR')}</span>
+                        <span style="color: ${e.status === 'success' ? '#4caf50' : '#f44336'}">
+                            ${e.status === 'success' ? '✓ Succès' : '✗ Échec'}
+                        </span>
+                        <span style="color: #00d4ff">${e.duration}s</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

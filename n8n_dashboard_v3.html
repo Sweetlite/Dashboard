@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N8N Control Center v3</title>
+    <style>
+        :root {
+            /* Theme Colors - Dark */
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --border-color: #2a2a3a;
+
+            /* Project Colors */
+            --color-itradeit: #00d4ff;
+            --color-wishlist: #ff6b6b;
+            --color-sorties: #9c27b0;
+            --color-briefing: #ffc107;
+            --color-all: #4caf50;
+
+            /* Status Colors */
+            --color-success: #4caf50;
+            --color-error: #f44336;
+            --color-warning: #ff9800;
+            --color-running: #2196f3;
+
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f5f5f7;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background var(--transition-normal), color var(--transition-normal);
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--color-itradeit), var(--color-sorties));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-left: 2.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: border-color var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-itradeit);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--bg-card);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all var(--transition-fast);
+        }
+
+        .icon-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+        }
+
+        /* Quick Access Section */
+        .quick-access {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .favorites-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .favorite-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.9rem;
+        }
+
+        .favorite-chip:hover {
+            border-color: var(--color-itradeit);
+            transform: translateY(-1px);
+        }
+
+        .favorite-chip.running {
+            border-color: var(--color-running);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .favorite-chip .remove {
+            color: var(--text-secondary);
+            margin-left: 0.25rem;
+        }
+
+        .favorite-chip .remove:hover {
+            color: var(--color-error);
+        }
+
+        .empty-favorites {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.6rem 1.25rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab:hover {
+            border-color: var(--text-secondary);
+        }
+
+        .tab.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .tab[data-project="all"].active { border-color: var(--color-all); color: var(--color-all); }
+        .tab[data-project="itradeit"].active { border-color: var(--color-itradeit); color: var(--color-itradeit); }
+        .tab[data-project="wishlist"].active { border-color: var(--color-wishlist); color: var(--color-wishlist); }
+        .tab[data-project="sorties"].active { border-color: var(--color-sorties); color: var(--color-sorties); }
+        .tab[data-project="briefing"].active { border-color: var(--color-briefing); color: var(--color-briefing); }
+
+        .tab-count {
+            background: var(--border-color);
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        /* Workflow Grid */
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .workflow-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .workflow-card:hover {
+            border-color: var(--text-secondary);
+            transform: translateY(-2px);
+        }
+
+        .workflow-card[data-project="itradeit"] { border-left: 3px solid var(--color-itradeit); }
+        .workflow-card[data-project="wishlist"] { border-left: 3px solid var(--color-wishlist); }
+        .workflow-card[data-project="sorties"] { border-left: 3px solid var(--color-sorties); }
+        .workflow-card[data-project="briefing"] { border-left: 3px solid var(--color-briefing); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+        }
+
+        .favorite-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            padding: 0.25rem;
+            transition: all var(--transition-fast);
+        }
+
+        .favorite-btn:hover {
+            color: var(--color-warning);
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.active {
+            color: var(--color-warning);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-success);
+        }
+
+        .status-dot.inactive {
+            background: var(--text-secondary);
+        }
+
+        .execute-btn {
+            width: 100%;
+            padding: 0.7rem;
+            background: linear-gradient(135deg, var(--color-itradeit), #0099cc);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .execute-btn:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+        }
+
+        .execute-btn:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+            filter: none;
+        }
+
+        .execute-btn.running {
+            background: var(--color-running);
+        }
+
+        /* History Section */
+        .history-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .clear-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: color var(--transition-fast);
+        }
+
+        .clear-btn:hover {
+            color: var(--color-error);
+        }
+
+        .history-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background: var(--bg-card);
+            font-size: 0.9rem;
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .history-status {
+            font-size: 1rem;
+        }
+
+        .history-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .history-time {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .history-duration {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .empty-history {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        /* Settings Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-normal);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(20px);
+            transition: transform var(--transition-normal);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-itradeit);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--color-itradeit);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .save-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Connection Status */
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .connection-status.connected {
+            color: var(--color-success);
+        }
+
+        .connection-status.disconnected {
+            color: var(--color-error);
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--color-itradeit);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+            min-width: 280px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success { border-left: 3px solid var(--color-success); }
+        .toast.error { border-left: 3px solid var(--color-error); }
+        .toast.info { border-left: 3px solid var(--color-running); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-wrap: wrap;
+                padding: 1rem;
+            }
+
+            .search-container {
+                order: 3;
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+
+            .workflow-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            <span>N8N Control Center</span>
+        </div>
+
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="searchInput" placeholder="Rechercher un workflow... (Ctrl+K)">
+        </div>
+
+        <div class="header-actions">
+            <div class="connection-status disconnected" id="connectionStatus">
+                <span class="status-indicator">●</span>
+                <span id="statusText">Non connecte</span>
+            </div>
+            <button class="icon-btn" id="themeToggle" title="Changer de theme">🌙</button>
+            <button class="icon-btn" id="refreshBtn" title="Rafraichir">🔄</button>
+            <button class="icon-btn" id="settingsBtn" title="Configuration">⚙️</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Quick Access -->
+        <section class="quick-access">
+            <div class="section-title">⭐ Quick Access</div>
+            <div class="favorites-grid" id="favoritesGrid">
+                <span class="empty-favorites">Cliquez sur ★ pour ajouter des favoris</span>
+            </div>
+        </section>
+
+        <!-- Tabs -->
+        <div class="tabs-container" id="tabsContainer">
+            <button class="tab active" data-project="all">
+                Tous <span class="tab-count" id="countAll">0</span>
+            </button>
+            <button class="tab" data-project="itradeit">
+                📈 I_Trade_It <span class="tab-count" id="countItradeit">0</span>
+            </button>
+            <button class="tab" data-project="wishlist">
+                🛒 WishList <span class="tab-count" id="countWishlist">0</span>
+            </button>
+            <button class="tab" data-project="sorties">
+                🎭 Sorties <span class="tab-count" id="countSorties">0</span>
+            </button>
+            <button class="tab" data-project="briefing">
+                ☀️ Briefing <span class="tab-count" id="countBriefing">0</span>
+            </button>
+        </div>
+
+        <!-- Workflow Grid -->
+        <div class="workflow-grid" id="workflowGrid">
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <span>Chargement des workflows...</span>
+            </div>
+        </div>
+
+        <!-- History -->
+        <section class="history-section">
+            <div class="history-header">
+                <div class="section-title">📋 Historique des executions</div>
+                <button class="clear-btn" id="clearHistory">Effacer</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="empty-history">Aucune execution recente</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">⚙️ Configuration</h2>
+                <button class="close-btn" id="closeSettings">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">URL N8N</label>
+                <input type="text" class="form-input" id="n8nUrl" placeholder="https://n8n.example.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cle API N8N</label>
+                <input type="password" class="form-input" id="n8nApiKey" placeholder="Votre cle API">
+            </div>
+            <button class="save-btn" id="saveSettings">💾 Sauvegarder</button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        const state = {
+            workflows: [],
+            favorites: [],
+            history: [],
+            config: {
+                n8nUrl: 'https://n8n.srv1230871.hstgr.cloud',
+                n8nApiKey: '',
+                theme: 'dark'
+            },
+            currentFilter: 'all',
+            searchQuery: '',
+            runningWorkflows: new Set()
+        };
+
+        // ============================================
+        // LOCAL STORAGE
+        // ============================================
+        function loadState() {
+            const savedConfig = localStorage.getItem('n8n_control_config');
+            const savedFavorites = localStorage.getItem('n8n_control_favorites');
+            const savedHistory = localStorage.getItem('n8n_control_history');
+            const savedTheme = localStorage.getItem('n8n_control_theme');
+
+            if (savedConfig) state.config = { ...state.config, ...JSON.parse(savedConfig) };
+            if (savedFavorites) state.favorites = JSON.parse(savedFavorites);
+            if (savedHistory) state.history = JSON.parse(savedHistory);
+            if (savedTheme) state.config.theme = savedTheme;
+
+            applyTheme();
+            updateSettingsForm();
+        }
+
+        function saveConfig() {
+            localStorage.setItem('n8n_control_config', JSON.stringify({
+                n8nUrl: state.config.n8nUrl,
+                n8nApiKey: state.config.n8nApiKey
+            }));
+        }
+
+        function saveFavorites() {
+            localStorage.setItem('n8n_control_favorites', JSON.stringify(state.favorites));
+        }
+
+        function saveHistory() {
+            localStorage.setItem('n8n_control_history', JSON.stringify(state.history.slice(0, 50)));
+        }
+
+        function saveTheme() {
+            localStorage.setItem('n8n_control_theme', state.config.theme);
+        }
+
+        // ============================================
+        // THEME MANAGEMENT
+        // ============================================
+        function applyTheme() {
+            document.body.setAttribute('data-theme', state.config.theme);
+            document.getElementById('themeToggle').textContent = state.config.theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleTheme() {
+            state.config.theme = state.config.theme === 'dark' ? 'light' : 'dark';
+            applyTheme();
+            saveTheme();
+        }
+
+        // ============================================
+        // API FUNCTIONS
+        // ============================================
+        async function fetchWorkflows() {
+            if (!state.config.n8nUrl || !state.config.n8nApiKey) {
+                showToast('Veuillez configurer l\'URL et la cle API N8N', 'error');
+                return [];
+            }
+
+            try {
+                const response = await fetch(`${state.config.n8nUrl}/api/v1/workflows`, {
+                    headers: {
+                        'X-N8N-API-KEY': state.config.n8nApiKey
+                    }
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const data = await response.json();
+                updateConnectionStatus(true);
+                return data.data || data;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                updateConnectionStatus(false);
+                showToast(`Erreur de connexion: ${error.message}`, 'error');
+                return [];
+            }
+        }
+
+        async function executeWorkflow(workflowId, workflowName) {
+            if (state.runningWorkflows.has(workflowId)) {
+                showToast('Ce workflow est deja en cours d\'execution', 'info');
+                return;
+            }
+
+            state.runningWorkflows.add(workflowId);
+            updateWorkflowCard(workflowId, true);
+            updateFavoriteChip(workflowId, true);
+
+            const startTime = Date.now();
+
+            try {
+                // Try the new API first (v1/workflows/{id}/run)
+                let response = await fetch(`${state.config.n8nUrl}/api/v1/workflows/${workflowId}/run`, {
+                    method: 'POST',
+                    headers: {
+                        'X-N8N-API-KEY': state.config.n8nApiKey,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                // Fallback to executions endpoint if run endpoint doesn't exist
+                if (response.status === 404) {
+                    response = await fetch(`${state.config.n8nUrl}/api/v1/executions`, {
+                        method: 'POST',
+                        headers: {
+                            'X-N8N-API-KEY': state.config.n8nApiKey,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ workflowId: workflowId })
+                    });
+                }
+
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                addHistoryEntry(workflowId, workflowName, 'success', duration);
+                showToast(`✅ ${workflowName} execute avec succes`, 'success');
+            } catch (error) {
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+                addHistoryEntry(workflowId, workflowName, 'error', duration);
+                showToast(`❌ Erreur: ${error.message}`, 'error');
+            } finally {
+                state.runningWorkflows.delete(workflowId);
+                updateWorkflowCard(workflowId, false);
+                updateFavoriteChip(workflowId, false);
+            }
+        }
+
+        // ============================================
+        // PROJECT DETECTION
+        // ============================================
+        function detectProject(workflowName) {
+            const name = workflowName.toLowerCase();
+
+            // I_Trade_It patterns
+            if (name.includes('trade') || name.includes('cac') || name.includes('sbf') ||
+                name.includes('sp500') || name.includes('s&p') || name.includes('screening') ||
+                name.includes('position') || name.includes('scout') || name.includes('stock') ||
+                name.includes('signal') || name.includes('buy') || name.includes('sell') ||
+                name.includes('market') || name.includes('indices') || name.includes('batch') ||
+                name.includes('maj') || name.includes('watchlist')) {
+                return 'itradeit';
+            }
+
+            // WishList patterns
+            if (name.includes('wish') || name.includes('shopping') || name.includes('price') ||
+                name.includes('product') || name.includes('amazon') || name.includes('fnac')) {
+                return 'wishlist';
+            }
+
+            // Sorties Culturelles patterns
+            if (name.includes('sortie') || name.includes('cultural') || name.includes('event') ||
+                name.includes('concert') || name.includes('expo') || name.includes('rss') ||
+                name.includes('spectacle') || name.includes('theatre')) {
+                return 'sorties';
+            }
+
+            // Briefing patterns
+            if (name.includes('brief') || name.includes('morning') || name.includes('daily') ||
+                name.includes('meteo') || name.includes('weather') || name.includes('agenda')) {
+                return 'briefing';
+            }
+
+            return 'itradeit'; // Default
+        }
+
+        function getProjectIcon(project) {
+            const icons = {
+                'itradeit': '📈',
+                'wishlist': '🛒',
+                'sorties': '🎭',
+                'briefing': '☀️'
+            };
+            return icons[project] || '⚡';
+        }
+
+        // ============================================
+        // UI RENDERING
+        // ============================================
+        function renderWorkflows() {
+            const grid = document.getElementById('workflowGrid');
+
+            let filtered = state.workflows;
+
+            // Filter by project
+            if (state.currentFilter !== 'all') {
+                filtered = filtered.filter(wf => detectProject(wf.name) === state.currentFilter);
+            }
+
+            // Filter by search
+            if (state.searchQuery) {
+                const query = state.searchQuery.toLowerCase();
+                filtered = filtered.filter(wf => wf.name.toLowerCase().includes(query));
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="loading-container">
+                        <span>${state.workflows.length === 0 ? '⚙️ Configurez votre connexion N8N pour commencer' : 'Aucun resultat pour cette recherche.'}</span>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(wf => {
+                const project = detectProject(wf.name);
+                const isFavorite = state.favorites.includes(wf.id);
+                const isRunning = state.runningWorkflows.has(wf.id);
+
+                return `
+                    <div class="workflow-card" data-project="${project}" data-id="${wf.id}">
+                        <div class="card-header">
+                            <span class="card-icon">${getProjectIcon(project)}</span>
+                            <button class="favorite-btn ${isFavorite ? 'active' : ''}"
+                                    onclick="toggleFavorite('${wf.id}', '${escapeHtml(wf.name)}')"
+                                    title="Ajouter aux favoris">
+                                ${isFavorite ? '★' : '☆'}
+                            </button>
+                        </div>
+                        <h3 class="card-title">${escapeHtml(wf.name)}</h3>
+                        <div class="card-meta">
+                            <span class="status-badge">
+                                <span class="status-dot ${wf.active ? '' : 'inactive'}"></span>
+                                ${wf.active ? 'Actif' : 'Inactif'}
+                            </span>
+                        </div>
+                        <button class="execute-btn ${isRunning ? 'running' : ''}"
+                                onclick="executeWorkflow('${wf.id}', '${escapeHtml(wf.name)}')"
+                                ${isRunning ? 'disabled' : ''}>
+                            ${isRunning ? '⏳ Execution...' : '▶️ Executer'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            updateTabCounts();
+        }
+
+        function renderFavorites() {
+            const grid = document.getElementById('favoritesGrid');
+
+            if (state.favorites.length === 0) {
+                grid.innerHTML = '<span class="empty-favorites">Cliquez sur ★ pour ajouter des favoris</span>';
+                return;
+            }
+
+            const favoriteWorkflows = state.favorites
+                .map(id => state.workflows.find(wf => wf.id === id))
+                .filter(Boolean);
+
+            if (favoriteWorkflows.length === 0) {
+                grid.innerHTML = '<span class="empty-favorites">Chargez les workflows pour voir vos favoris</span>';
+                return;
+            }
+
+            grid.innerHTML = favoriteWorkflows.map(wf => {
+                const isRunning = state.runningWorkflows.has(wf.id);
+                return `
+                    <div class="favorite-chip ${isRunning ? 'running' : ''}"
+                         data-id="${wf.id}"
+                         onclick="executeWorkflow('${wf.id}', '${escapeHtml(wf.name)}')">
+                        ${getProjectIcon(detectProject(wf.name))} ${escapeHtml(wf.name)}
+                        <span class="remove" onclick="event.stopPropagation(); removeFavorite('${wf.id}')" title="Retirer des favoris">×</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+
+            if (state.history.length === 0) {
+                list.innerHTML = '<div class="empty-history">Aucune execution recente</div>';
+                return;
+            }
+
+            list.innerHTML = state.history.map(entry => `
+                <div class="history-item">
+                    <span class="history-status">${entry.status === 'success' ? '✅' : '❌'}</span>
+                    <span class="history-name">${escapeHtml(entry.name)}</span>
+                    <span class="history-time">${entry.time}</span>
+                    <span class="history-duration">${entry.duration}s</span>
+                </div>
+            `).join('');
+        }
+
+        function updateTabCounts() {
+            const counts = {
+                all: state.workflows.length,
+                itradeit: 0,
+                wishlist: 0,
+                sorties: 0,
+                briefing: 0
+            };
+
+            state.workflows.forEach(wf => {
+                const project = detectProject(wf.name);
+                counts[project]++;
+            });
+
+            document.getElementById('countAll').textContent = counts.all;
+            document.getElementById('countItradeit').textContent = counts.itradeit;
+            document.getElementById('countWishlist').textContent = counts.wishlist;
+            document.getElementById('countSorties').textContent = counts.sorties;
+            document.getElementById('countBriefing').textContent = counts.briefing;
+        }
+
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            const text = document.getElementById('statusText');
+
+            status.classList.toggle('connected', connected);
+            status.classList.toggle('disconnected', !connected);
+            text.textContent = connected ? 'Connecte' : 'Non connecte';
+        }
+
+        function updateWorkflowCard(workflowId, running) {
+            const card = document.querySelector(`.workflow-card[data-id="${workflowId}"]`);
+            if (card) {
+                const btn = card.querySelector('.execute-btn');
+                btn.classList.toggle('running', running);
+                btn.disabled = running;
+                btn.innerHTML = running ? '⏳ Execution...' : '▶️ Executer';
+            }
+        }
+
+        function updateFavoriteChip(workflowId, running) {
+            const chip = document.querySelector(`.favorite-chip[data-id="${workflowId}"]`);
+            if (chip) {
+                chip.classList.toggle('running', running);
+            }
+        }
+
+        function updateSettingsForm() {
+            document.getElementById('n8nUrl').value = state.config.n8nUrl || '';
+            document.getElementById('n8nApiKey').value = state.config.n8nApiKey || '';
+        }
+
+        // ============================================
+        // FAVORITES MANAGEMENT
+        // ============================================
+        function toggleFavorite(workflowId, workflowName) {
+            const index = state.favorites.indexOf(workflowId);
+
+            if (index === -1) {
+                state.favorites.push(workflowId);
+                showToast(`⭐ ${workflowName} ajoute aux favoris`, 'success');
+            } else {
+                state.favorites.splice(index, 1);
+                showToast(`${workflowName} retire des favoris`, 'info');
+            }
+
+            saveFavorites();
+            renderWorkflows();
+            renderFavorites();
+        }
+
+        function removeFavorite(workflowId) {
+            state.favorites = state.favorites.filter(id => id !== workflowId);
+            saveFavorites();
+            renderWorkflows();
+            renderFavorites();
+        }
+
+        // ============================================
+        // HISTORY MANAGEMENT
+        // ============================================
+        function addHistoryEntry(workflowId, workflowName, status, duration) {
+            const entry = {
+                id: workflowId,
+                name: workflowName,
+                status: status,
+                duration: duration,
+                time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now()
+            };
+
+            state.history.unshift(entry);
+            state.history = state.history.slice(0, 50);
+
+            saveHistory();
+            renderHistory();
+        }
+
+        function clearHistory() {
+            state.history = [];
+            saveHistory();
+            renderHistory();
+            showToast('Historique efface', 'info');
+        }
+
+        // ============================================
+        // TOAST NOTIFICATIONS
+        // ============================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // EVENT HANDLERS
+        // ============================================
+        function setupEventListeners() {
+            // Theme toggle
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', async () => {
+                showToast('Rafraichissement...', 'info');
+                state.workflows = await fetchWorkflows();
+                renderWorkflows();
+                renderFavorites();
+            });
+
+            // Settings modal
+            document.getElementById('settingsBtn').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.add('active');
+            });
+
+            document.getElementById('closeSettings').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.remove('active');
+            });
+
+            document.getElementById('settingsModal').addEventListener('click', (e) => {
+                if (e.target.id === 'settingsModal') {
+                    e.target.classList.remove('active');
+                }
+            });
+
+            // Save settings
+            document.getElementById('saveSettings').addEventListener('click', async () => {
+                state.config.n8nUrl = document.getElementById('n8nUrl').value.replace(/\/$/, '');
+                state.config.n8nApiKey = document.getElementById('n8nApiKey').value;
+                saveConfig();
+
+                document.getElementById('settingsModal').classList.remove('active');
+                showToast('Configuration sauvegardee', 'success');
+
+                state.workflows = await fetchWorkflows();
+                renderWorkflows();
+                renderFavorites();
+            });
+
+            // Search
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                state.searchQuery = e.target.value;
+                renderWorkflows();
+            });
+
+            // Tabs
+            document.getElementById('tabsContainer').addEventListener('click', (e) => {
+                const tab = e.target.closest('.tab');
+                if (tab) {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    state.currentFilter = tab.dataset.project;
+                    renderWorkflows();
+                }
+            });
+
+            // Clear history
+            document.getElementById('clearHistory').addEventListener('click', clearHistory);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + K for search focus
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+                // Escape to close modal
+                if (e.key === 'Escape') {
+                    document.getElementById('settingsModal').classList.remove('active');
+                }
+            });
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        async function init() {
+            loadState();
+            setupEventListeners();
+            renderHistory();
+
+            if (state.config.n8nUrl && state.config.n8nApiKey) {
+                state.workflows = await fetchWorkflows();
+                renderWorkflows();
+                renderFavorites();
+            } else {
+                document.getElementById('workflowGrid').innerHTML = `
+                    <div class="loading-container">
+                        <span>⚙️ Configurez votre connexion N8N pour commencer</span>
+                    </div>
+                `;
+                document.getElementById('settingsModal').classList.add('active');
+            }
+        }
+
+        // Start the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

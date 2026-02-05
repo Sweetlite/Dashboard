@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f8f7f4" media="(prefers-color-scheme: light)">
+    <title>Ma Page d'Accueil</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* === THÈME CLAIR - Style Apple/Notion === */
+            --bg-primary: #fafafa;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: #f5f5f5;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --text-muted: #aeaeb2;
+            --accent: #0071e3;
+            --accent-hover: #0077ed;
+            --border: rgba(0, 0, 0, 0.06);
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --card-radius: 14px;
+            --transition: all 0.2s ease;
+            --transition-slow: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* === THÈME SOMBRE - Style Apple === */
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-secondary: #1c1c1e;
+            --bg-card: #1c1c1e;
+            --bg-hover: #2c2c2e;
+            --text-primary: #f5f5f7;
+            --text-secondary: #98989d;
+            --text-muted: #636366;
+            --accent: #0a84ff;
+            --accent-hover: #409cff;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+
+        .container {
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 30px 24px;
+            padding-top: calc(30px + env(safe-area-inset-top, 0px));
+            padding-left: calc(24px + env(safe-area-inset-left, 0px));
+            padding-right: calc(24px + env(safe-area-inset-right, 0px));
+            padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+        }
+
+        /* === LAYOUT 2 COLONNES === */
+        .main-layout {
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* === SIDEBAR WORKFLOWS (Droite) === */
+        .workflows-sidebar {
+            width: 380px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 30px;
+            max-height: calc(100vh - 60px);
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .workflows-sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .workflows-sidebar::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-last-update {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        /* === CATÉGORIES WORKFLOWS === */
+        .wf-category {
+            margin-bottom: 20px;
+        }
+
+        .wf-category-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin: 0;
+            padding-left: 2px;
+            transition: var(--transition);
+        }
+
+        .wf-category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 4px 0;
+            margin-bottom: 10px;
+        }
+
+        .wf-category-header:hover .wf-category-title {
+            color: var(--text-secondary);
+        }
+
+        .wf-toggle {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .wf-category.collapsed .wf-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .wf-category.collapsed .wf-category-list {
+            display: none;
+        }
+
+        .wf-category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* === CARTE WORKFLOW - Format liste === */
+        .wf-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .wf-card:hover {
+            background: var(--bg-hover);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .wf-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .wf-badge-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-card);
+        }
+
+        .wf-badge-dot.ok { background: #30d158; }
+        .wf-badge-dot.error { background: #ff453a; }
+        .wf-badge-dot.actif { background: #0a84ff; }
+
+        .wf-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .wf-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.3;
+        }
+
+        .wf-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .wf-badge {
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 2px 5px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .wf-badge.ok {
+            background: rgba(48, 209, 88, 0.15);
+            color: #30d158;
+        }
+
+        .wf-badge.actif {
+            background: rgba(10, 132, 255, 0.15);
+            color: #0a84ff;
+        }
+
+        .wf-badge.error {
+            background: rgba(255, 69, 58, 0.15);
+            color: #ff453a;
+        }
+
+        .wf-time {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .wf-link {
+            color: var(--text-muted);
+            opacity: 0.4;
+            transition: var(--transition);
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .wf-card:hover .wf-link {
+            opacity: 0.8;
+        }
+
+        .wf-link:hover {
+            opacity: 1 !important;
+            color: var(--accent);
+        }
+
+        .wf-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 16px;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+        }
+
+        .wf-config {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            background: var(--bg-card);
+            border-radius: 14px;
+        }
+
+        .wf-config input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            background: var(--bg-primary);
+            box-shadow: var(--shadow);
+            font-size: 0.75rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* === EN-TÊTE === */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .datetime {
+            text-align: left;
+        }
+
+        .time {
+            font-size: 3.5rem;
+            font-weight: 600;
+            letter-spacing: -3px;
+            line-height: 1;
+            color: var(--text-primary);
+        }
+
+        .date {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            font-weight: 400;
+            text-transform: capitalize;
+            letter-spacing: -0.1px;
+        }
+
+        .greeting {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* === METEO === */
+        .weather {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 6px 10px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            max-width: fit-content;
+            box-shadow: var(--shadow);
+        }
+
+        .weather-icon {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .weather-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .weather-temp {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .weather-desc {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .weather-location {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            margin-left: 2px;
+            white-space: nowrap;
+        }
+
+        .weather.loading {
+            opacity: 0.5;
+        }
+
+        .weather.loading .weather-icon {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* === SWITCH THÈME === */
+        .theme-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-secondary);
+            border-radius: 28px;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .theme-slider::before {
+            position: absolute;
+            content: "○";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 2px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--text-muted);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+
+        .theme-switch input:checked + .theme-slider {
+            background: var(--text-primary);
+        }
+
+        .theme-switch input:checked + .theme-slider::before {
+            transform: translateX(24px);
+            content: "●";
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .theme-slider:hover {
+            border-color: var(--text-muted);
+        }
+
+        /* === BARRE DE RECHERCHE === */
+        .search-container {
+            margin-bottom: 28px;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 480px;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            font-size: 0.9rem;
+            font-family: 'Outfit', sans-serif;
+            border: none;
+            border-radius: 10px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: var(--shadow-hover), 0 0 0 3px rgba(0, 113, 227, 0.12);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* === CATÉGORIES === */
+        .category {
+            margin-bottom: 24px;
+        }
+
+        .category-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            padding-left: 2px;
+        }
+
+        /* === GRILLE DE LIENS - Style Apple Apps === */
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+        }
+
+        .link-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1;
+            padding: 12px 8px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-card:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-hover);
+            background: var(--bg-hover);
+        }
+
+        .link-card:active {
+            transform: scale(0.95);
+        }
+
+        .link-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+            font-size: 1.4rem;
+            background: var(--bg-primary);
+            transition: var(--transition);
+        }
+
+        .link-card:hover .link-icon {
+            transform: scale(1.1);
+        }
+
+        /* Favicon depuis Google */
+        .link-icon img {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+
+        /* Emoji comme icone */
+        .link-icon:not(:has(img)) {
+            font-size: 1.4rem;
+        }
+
+        .link-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-align: center;
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .link-url {
+            display: none;
+        }
+
+        /* === COULEURS PAR SITE (subtiles) === */
+        .link-card[data-color="red"]:hover { --card-accent: #ff453a; }
+        .link-card[data-color="orange"]:hover { --card-accent: #ff9f0a; }
+        .link-card[data-color="yellow"]:hover { --card-accent: #ffd60a; }
+        .link-card[data-color="green"]:hover { --card-accent: #30d158; }
+        .link-card[data-color="blue"]:hover { --card-accent: #0a84ff; }
+        .link-card[data-color="purple"]:hover { --card-accent: #bf5af2; }
+        .link-card[data-color="pink"]:hover { --card-accent: #ff375f; }
+        .link-card[data-color="cyan"]:hover { --card-accent: #64d2ff; }
+
+        .link-card[data-color]:hover .link-icon {
+            box-shadow: 0 0 0 2px var(--card-accent);
+        }
+
+        /* === FOOTER === */
+        footer {
+            margin-top: 48px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .edit-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .edit-hint code {
+            background: var(--bg-secondary);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* === RESPONSIVE === */
+
+        /* Tres grands ecrans */
+        @media (min-width: 1600px) {
+            .container {
+                max-width: 1600px;
+                padding: 60px 48px;
+            }
+            .time {
+                font-size: 5.5rem;
+            }
+            .links-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        /* Tablettes paysage */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 32px 20px;
+            }
+            .time {
+                font-size: 3.5rem;
+            }
+            .links-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 14px;
+            }
+        }
+
+        /* Tablettes portrait */
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px 16px;
+            }
+            .time {
+                font-size: 3rem;
+            }
+            .date {
+                font-size: 1rem;
+            }
+            .greeting {
+                font-size: 1.2rem;
+            }
+            .search-input {
+                padding: 14px 20px 14px 48px;
+                font-size: 1rem;
+            }
+            .links-grid {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                gap: 12px;
+            }
+            .link-card,
+            .workflow-card {
+                padding: 18px 12px;
+            }
+            .link-icon,
+            .workflow-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 1.4rem;
+            }
+            .link-name {
+                font-size: 0.85rem;
+            }
+            .category {
+                margin-bottom: 32px;
+            }
+            .category-title {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Mobiles */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 12px;
+            }
+            header {
+                margin-bottom: 32px;
+            }
+            .time {
+                font-size: 2.5rem;
+                letter-spacing: -2px;
+            }
+            .date {
+                font-size: 0.9rem;
+            }
+            .greeting {
+                font-size: 1rem;
+            }
+            .weather {
+                padding: 10px 12px;
+                gap: 10px;
+            }
+            .weather-icon {
+                font-size: 1.5rem;
+            }
+            .weather-temp {
+                font-size: 1.1rem;
+            }
+            .weather-desc {
+                font-size: 0.7rem;
+            }
+            .weather-location {
+                font-size: 0.65rem;
+            }
+            .theme-switch {
+                width: 46px;
+                height: 24px;
+            }
+            .theme-slider::before {
+                height: 18px;
+                width: 18px;
+                font-size: 12px;
+            }
+            .theme-switch input:checked + .theme-slider::before {
+                transform: translateX(22px);
+            }
+            .search-container {
+                margin-bottom: 32px;
+            }
+            .search-input {
+                padding: 12px 16px 12px 44px;
+                font-size: 0.95rem;
+                border-radius: 12px;
+            }
+            .links-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            .link-card,
+            .workflow-card,
+            .add-card {
+                padding: 16px 8px;
+                border-radius: 12px;
+            }
+            .link-icon,
+            .workflow-icon {
+                width: 40px;
+                height: 40px;
+                margin-bottom: 8px;
+                font-size: 1.3rem;
+            }
+            .link-name {
+                font-size: 0.75rem;
+            }
+            .category {
+                margin-bottom: 24px;
+            }
+            .category-title {
+                font-size: 0.75rem;
+                margin-bottom: 12px;
+            }
+            .modal {
+                width: 95%;
+                border-radius: 16px;
+            }
+            .modal-body {
+                padding: 20px 16px;
+            }
+            .toast {
+                padding: 12px 20px;
+                font-size: 0.85rem;
+                bottom: 20px;
+            }
+        }
+
+        /* Tres petits mobiles */
+        @media (max-width: 360px) {
+            .links-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .time {
+                font-size: 2.2rem;
+            }
+        }
+
+        /* === ANIMATION D'ENTRÉE === */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .category {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .category:nth-child(2) { animation-delay: 0.1s; }
+        .category:nth-child(3) { animation-delay: 0.2s; }
+        .category:nth-child(4) { animation-delay: 0.3s; }
+
+        /* === WORKFLOWS N8N === */
+        .workflow-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 14px;
+            background: var(--bg-card);
+            border-radius: var(--card-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workflow-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            background: var(--bg-hover);
+        }
+
+        .workflow-card:active {
+            transform: scale(0.97);
+        }
+
+        .workflow-card.running {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .workflow-card.success {
+            box-shadow: inset 0 0 0 2px #30d158;
+        }
+
+        .workflow-card.error {
+            box-shadow: inset 0 0 0 2px #ff453a;
+        }
+
+        .workflow-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 1.6rem;
+            background: var(--bg-primary);
+            transition: var(--transition);
+        }
+
+        .workflow-card:hover .workflow-icon {
+            transform: scale(1.08);
+        }
+
+        .workflow-card.running .workflow-icon {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .workflow-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-top: 8px;
+        }
+
+        .workflow-card.running .workflow-spinner {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            padding: 12px 20px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.25s ease;
+            max-width: calc(100% - 40px);
+            text-align: center;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            background: #30d158;
+            color: white;
+        }
+
+        .toast.error {
+            background: #ff453a;
+            color: white;
+        }
+
+        /* === BOUTON AJOUTER === */
+        .add-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 14px;
+            background: transparent;
+            border: 1.5px dashed var(--border);
+            border-radius: var(--card-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            min-height: 100px;
+        }
+
+        .add-card:hover {
+            border-color: var(--text-muted);
+            background: var(--bg-card);
+        }
+
+        .add-card .add-icon {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+            font-weight: 300;
+        }
+
+        .add-card:hover .add-icon {
+            color: var(--text-secondary);
+            transform: scale(1.1);
+        }
+
+        /* === BOUTON SUPPRIMER === */
+        .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .workflow-card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
+
+        /* === MODAL === */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .modal-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.95) translateY(10px);
+            transition: all 0.25s ease;
+        }
+
+        .modal-backdrop.show .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .modal-close {
+            background: var(--bg-primary);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            font-family: 'Outfit', sans-serif;
+            border: none;
+            border-radius: 10px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            box-shadow: var(--shadow), 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .emoji-picker {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .emoji-btn {
+            width: 38px;
+            height: 38px;
+            background: var(--bg-primary);
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .emoji-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .emoji-btn.selected {
+            background: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: 'Outfit', sans-serif;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .empty-workflows {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        /* === WIDGET WORKFLOWS - Style iOS Apps === */
+        .status-section {
+            margin-bottom: 24px;
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .status-header .category-title {
+            margin-bottom: 0;
+        }
+
+        .status-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-last-update {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+
+        .refresh-all-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--bg-card);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .refresh-all-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .refresh-all-btn.spinning svg {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Responsive sidebar */
+        @media (max-width: 1100px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .workflows-sidebar {
+                width: 100%;
+                position: static;
+                max-height: none;
+                order: -1;
+                margin-bottom: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .links-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+            .link-card {
+                border-radius: 14px;
+                padding: 10px 6px;
+            }
+            .link-icon {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+            }
+            .link-icon img {
+                width: 24px;
+                height: 24px;
+            }
+            .link-name {
+                font-size: 0.6rem;
+            }
+            .wf-card {
+                padding: 8px 10px;
+            }
+            .wf-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            .wf-name {
+                font-size: 0.75rem;
+            }
+            .wf-badge {
+                font-size: 0.55rem;
+            }
+            .wf-time {
+                font-size: 0.55rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- EN-TÊTE (hors du layout 2 colonnes) -->
+        <header>
+            <div class="datetime">
+                <div class="time" id="time">00:00</div>
+                <div class="date" id="date">Chargement...</div>
+                <div class="greeting" id="greeting">Bonjour</div>
+                <div class="weather loading" id="weather">
+                    <span class="weather-icon">🌤️</span>
+                    <div class="weather-info">
+                        <span class="weather-temp" id="weatherTemp">--°</span>
+                        <span class="weather-desc" id="weatherDesc">Chargement...</span>
+                    </div>
+                    <span class="weather-location" id="weatherLocation">📍 --</span>
+                </div>
+            </div>
+            <label class="theme-switch" title="Changer le thème">
+                <input type="checkbox" id="themeToggle">
+                <span class="theme-slider"></span>
+            </label>
+        </header>
+
+        <!-- RECHERCHE (hors du layout 2 colonnes) -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input
+                    type="text"
+                    class="search-input"
+                    id="searchInput"
+                    placeholder="Rechercher sur Google..."
+                    autofocus
+                >
+            </div>
+        </div>
+
+        <!-- LAYOUT 2 COLONNES : Raccourcis + Sidebar Workflows -->
+        <div class="main-layout">
+            <!-- CONTENU PRINCIPAL (Gauche) -->
+            <div class="main-content">
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             PERSONNALISE TES LIENS ICI !
+             
+             Pour ajouter un site :
+             1. Copie un bloc <a class="link-card">...</a>
+             2. Modifie href="URL_DU_SITE"
+             3. Modifie le nom dans <span class="link-name">
+             4. Change data-color pour la couleur (red, orange, yellow, green, blue, purple, pink, cyan)
+             
+             L'icône se charge automatiquement depuis Google !
+        ═══════════════════════════════════════════════════════════════ -->
+
+        <!-- CATÉGORIE : TRAVAIL -->
+        <section class="category">
+            <h2 class="category-title">💼 Travail</h2>
+            <div class="links-grid">
+                
+                <a href="https://n8n.srv1230871.hstgr.cloud/" target="_blank" class="link-card" data-color="orange">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=n8n.io&sz=64" alt="">
+                    </div>
+                    <span class="link-name">N8N</span>
+                </a>
+
+                <a href="https://mail.google.com" target="_blank" class="link-card" data-color="red">
+                    <div class="link-icon">
+                        <img src="https://www.gstatic.com/images/branding/product/2x/gmail_2020q4_48dp.png" alt="">
+                    </div>
+                    <span class="link-name">Gmail</span>
+                </a>
+
+                <a href="https://drive.google.com" target="_blank" class="link-card" data-color="yellow">
+                    <div class="link-icon">
+                        <img src="https://www.gstatic.com/images/branding/product/2x/drive_2020q4_48dp.png" alt="">
+                    </div>
+                    <span class="link-name">Drive</span>
+                </a>
+
+                <a href="https://calendar.google.com" target="_blank" class="link-card" data-color="blue">
+                    <div class="link-icon">
+                        <img src="https://www.gstatic.com/images/branding/product/2x/calendar_2020q4_48dp.png" alt="">
+                    </div>
+                    <span class="link-name">Agenda</span>
+                </a>
+
+                <a href="https://notion.so" target="_blank" class="link-card" data-color="purple">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=notion.so&sz=64" alt="" width="200" height="200">
+                    </div>
+					
+                    <span class="link-name">Notion</span>
+                </a>
+
+                <a href="https://clients.boursobank.com/connexion/saisie-mot-de-passe" target="_blank" class="link-card" data-color="pink">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=boursorama.com&sz=64" alt="">
+                    </div>
+                    <span class="link-name">Boursorama</span>
+                </a>
+
+                <a href="https://tradingboard.boursobank.com/" target="_blank" class="link-card" data-color="cyan">
+                    <div class="link-icon">📈</div>
+                    <span class="link-name">TradingBoard</span>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- WORKFLOWS N8N (boutons d'exécution) -->
+        <section class="category" id="workflowsSection">
+            <h2 class="category-title">⚡ Exécuter un Workflow</h2>
+            <div class="links-grid" id="workflowsGrid">
+                <!-- Rendu dynamiquement par JavaScript -->
+            </div>
+        </section>
+
+        <!-- CATÉGORIE : SOCIAL -->
+        <section class="category">
+            <h2 class="category-title">💬 Social</h2>
+            <div class="links-grid">
+
+                <a href="https://x.com" class="link-card" data-color="blue">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=x.com&sz=64" alt="">
+                    </div>
+                    <span class="link-name">X / Twitter</span>
+                </a>
+
+                <a href="https://linkedin.com" class="link-card" data-color="blue">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=linkedin.com&sz=64" alt="">
+                    </div>
+                    <span class="link-name">LinkedIn</span>
+                </a>
+
+                <a href="https://discord.com/app" class="link-card" data-color="purple">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=discord.com&sz=64" alt="">
+                    </div>
+                    <span class="link-name">Discord</span>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- CATÉGORIE : DIVERTISSEMENT -->
+        <section class="category">
+            <h2 class="category-title">🎬 Divertissement</h2>
+            <div class="links-grid">
+
+                <a href="https://youtube.com" class="link-card" data-color="red">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=64" alt="">
+                    </div>
+                    <span class="link-name">YouTube</span>
+                </a>
+
+                <a href="https://netflix.com" class="link-card" data-color="red">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=netflix.com&sz=64" alt="">
+                    </div>
+                    <span class="link-name">Netflix</span>
+                </a>
+
+                <a href="https://spotify.com" class="link-card" data-color="green">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=spotify.com&sz=64" alt="">
+                    </div>
+                    <span class="link-name">Spotify</span>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- CATÉGORIE : OUTILS -->
+        <section class="category">
+            <h2 class="category-title">🛠️ Outils</h2>
+            <div class="links-grid">
+
+                <a href="https://github.com" class="link-card" data-color="purple">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=github.com&sz=64" alt="">
+                    </div>
+                    <span class="link-name">GitHub</span>
+                </a>
+
+                <a href="https://claude.ai" class="link-card" data-color="orange">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="">
+                    </div>
+                    <span class="link-name">Claude</span>
+                </a>
+
+                <a href="https://chatgpt.com" class="link-card" data-color="green">
+                    <div class="link-icon">
+                        <img src="https://www.google.com/s2/favicons?domain=chatgpt.com&sz=64" alt="">
+                    </div>
+                    <span class="link-name">ChatGPT</span>
+                </a>
+
+            </div>
+        </section>
+
+            </div><!-- Fin main-content -->
+
+            <!-- SIDEBAR WORKFLOWS (Droite) -->
+            <aside class="workflows-sidebar" id="workflowsSidebar">
+                <div class="sidebar-header">
+                    <h2 class="sidebar-title">⚡ Workflows</h2>
+                    <div class="sidebar-actions">
+                        <span class="sidebar-last-update" id="statusLastUpdate"></span>
+                        <button class="refresh-all-btn" onclick="refreshAllWorkflows()" id="refreshAllBtn" title="Synchroniser">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Catégorie Trading -->
+                <div class="wf-category" id="wfCatTrading">
+                    <div class="wf-category-header" onclick="toggleWfCategory('wfCatTrading')">
+                        <h3 class="wf-category-title">📈 Trading</h3>
+                        <span class="wf-toggle">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="wf-category-list" id="wfListTrading">
+                        <div class="wf-empty">Chargement...</div>
+                    </div>
+                </div>
+
+                <!-- Catégorie Perso -->
+                <div class="wf-category" id="wfCatPerso">
+                    <div class="wf-category-header" onclick="toggleWfCategory('wfCatPerso')">
+                        <h3 class="wf-category-title">🏠 Perso</h3>
+                        <span class="wf-toggle">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="wf-category-list" id="wfListPerso">
+                        <div class="wf-empty">Chargement...</div>
+                    </div>
+                </div>
+
+                <!-- Catégorie @Work -->
+                <div class="wf-category" id="wfCatWork">
+                    <div class="wf-category-header" onclick="toggleWfCategory('wfCatWork')">
+                        <h3 class="wf-category-title">💼 @Work</h3>
+                        <span class="wf-toggle">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="wf-category-list" id="wfListWork">
+                        <div class="wf-empty">Chargement...</div>
+                    </div>
+                </div>
+            </aside>
+
+        </div><!-- Fin main-layout -->
+
+    <!-- MODAL AJOUTER WORKFLOW -->
+    <div class="modal-backdrop" id="addModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Ajouter un workflow</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nom du workflow</label>
+                    <input type="text" id="wfName" placeholder="Morning Brief">
+                </div>
+                <div class="form-group">
+                    <label>URL Webhook (Production)</label>
+                    <input type="text" id="wfUrl" placeholder="https://n8n.srv.../webhook/xxx">
+                    <small>Copie l'URL "Production" depuis le node Webhook dans N8N</small>
+                </div>
+                <div class="form-group">
+                    <label>Icone</label>
+                    <div class="emoji-picker" id="emojiPicker">
+                        <button type="button" class="emoji-btn selected" data-emoji="⚡">⚡</button>
+                        <button type="button" class="emoji-btn" data-emoji="🌅">🌅</button>
+                        <button type="button" class="emoji-btn" data-emoji="📈">📈</button>
+                        <button type="button" class="emoji-btn" data-emoji="💼">💼</button>
+                        <button type="button" class="emoji-btn" data-emoji="🛒">🛒</button>
+                        <button type="button" class="emoji-btn" data-emoji="🎭">🎭</button>
+                        <button type="button" class="emoji-btn" data-emoji="📊">📊</button>
+                        <button type="button" class="emoji-btn" data-emoji="🔔">🔔</button>
+                        <button type="button" class="emoji-btn" data-emoji="📧">📧</button>
+                        <button type="button" class="emoji-btn" data-emoji="🤖">🤖</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Couleur</label>
+                    <select id="wfColor">
+                        <option value="blue">Bleu</option>
+                        <option value="cyan">Cyan</option>
+                        <option value="green">Vert</option>
+                        <option value="yellow">Jaune</option>
+                        <option value="orange">Orange</option>
+                        <option value="red">Rouge</option>
+                        <option value="pink">Rose</option>
+                        <option value="purple">Violet</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-primary" onclick="saveWorkflow()">Ajouter</button>
+            </div>
+        </div>
+    </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p class="edit-hint">
+                💡 Pour personnaliser : ouvre ce fichier avec <code>Bloc-notes</code> ou <code>VS Code</code>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // HORLOGE & DATE
+        // ═══════════════════════════════════════════════════════════════
+        function updateTime() {
+            const now = new Date();
+            
+            // Heure
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('time').textContent = `${hours}:${minutes}`;
+            
+            // Date
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const dateStr = now.toLocaleDateString('fr-FR', options);
+            document.getElementById('date').textContent = dateStr;
+            
+            // Salutation
+            const hour = now.getHours();
+            let greeting = 'Bonne nuit';
+            if (hour >= 6 && hour < 12) greeting = 'Bonjour';
+            else if (hour >= 12 && hour < 18) greeting = 'Bon après-midi';
+            else if (hour >= 18 && hour < 22) greeting = 'Bonsoir';
+            document.getElementById('greeting').textContent = greeting;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // ═══════════════════════════════════════════════════════════════
+        // RECHERCHE GOOGLE
+        // ═══════════════════════════════════════════════════════════════
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                const query = encodeURIComponent(this.value.trim());
+                window.location.href = `https://www.google.com/search?q=${query}`;
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // THÈME CLAIR / SOMBRE
+        // ═══════════════════════════════════════════════════════════════
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        // Charger le thème sauvegardé ou utiliser le thème système
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+            themeToggle.checked = savedTheme === 'dark';
+        } else if (prefersDark) {
+            html.setAttribute('data-theme', 'dark');
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', () => {
+            const newTheme = themeToggle.checked ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // WORKFLOWS N8N (Dynamiques avec localStorage)
+        // ═══════════════════════════════════════════════════════════════
+
+        // Charger les workflows depuis localStorage
+        let workflows = JSON.parse(localStorage.getItem('n8n_workflows') || '[]');
+        let selectedEmoji = '⚡';
+
+        // Workflows par défaut (ajoutés automatiquement s'ils n'existent pas)
+        const defaultWorkflows = [
+            {
+                name: "Brief Moi",
+                url: "https://n8n.srv1230871.hstgr.cloud/webhook/brief-moi",
+                icon: "📋",
+                color: "cyan"
+            }
+        ];
+
+        // Ajouter les workflows par défaut s'ils n'existent pas déjà
+        defaultWorkflows.forEach(defaultWf => {
+            const exists = workflows.some(wf => wf.url === defaultWf.url);
+            if (!exists) {
+                workflows.push(defaultWf);
+            }
+        });
+        localStorage.setItem('n8n_workflows', JSON.stringify(workflows));
+
+        // Rendre les workflows au chargement
+        document.addEventListener('DOMContentLoaded', renderWorkflows);
+
+        function renderWorkflows() {
+            const grid = document.getElementById('workflowsGrid');
+
+            // Generer les cartes de workflows
+            let html = workflows.map((wf, index) => `
+                <div class="workflow-card"
+                     data-index="${index}"
+                     data-color="${wf.color}"
+                     onclick="runWorkflow(${index})">
+                    <button class="delete-btn" onclick="event.stopPropagation(); deleteWorkflow(${index})">✕</button>
+                    <div class="workflow-icon">${wf.icon}</div>
+                    <span class="link-name">${escapeHtml(wf.name)}</span>
+                    <div class="workflow-spinner"></div>
+                </div>
+            `).join('');
+
+            // Ajouter le bouton "+"
+            html += `
+                <div class="add-card" onclick="openModal()">
+                    <span class="add-icon">+</span>
+                </div>
+            `;
+
+            grid.innerHTML = html;
+        }
+
+        async function runWorkflow(index) {
+            const wf = workflows[index];
+            const card = document.querySelector(`[data-index="${index}"]`);
+
+            if (!wf || !wf.url) {
+                showToast('URL webhook manquante', 'error');
+                return;
+            }
+
+            card.classList.add('running');
+            card.classList.remove('success', 'error');
+
+            try {
+                const res = await fetch(wf.url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ source: 'homepage', timestamp: Date.now() })
+                });
+
+                if (res.ok) {
+                    card.classList.add('success');
+                    showToast(`${wf.name} execute`, 'success');
+                } else {
+                    throw new Error(`Erreur ${res.status}`);
+                }
+            } catch (err) {
+                card.classList.add('error');
+                showToast(`Echec: ${err.message}`, 'error');
+            } finally {
+                card.classList.remove('running');
+                setTimeout(() => card.classList.remove('success', 'error'), 3000);
+            }
+        }
+
+        function deleteWorkflow(index) {
+            if (confirm(`Supprimer "${workflows[index].name}" ?`)) {
+                workflows.splice(index, 1);
+                localStorage.setItem('n8n_workflows', JSON.stringify(workflows));
+                renderWorkflows();
+                showToast('Workflow supprime', '');
+            }
+        }
+
+        // Modal
+        function openModal() {
+            document.getElementById('wfName').value = '';
+            document.getElementById('wfUrl').value = '';
+            document.getElementById('wfColor').value = 'blue';
+            selectedEmoji = '⚡';
+            document.querySelectorAll('.emoji-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.emoji === selectedEmoji);
+            });
+            document.getElementById('addModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('addModal').classList.remove('show');
+        }
+
+        // Gestion du clic en dehors de la modal
+        document.getElementById('addModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addModal') closeModal();
+        });
+
+        // Selection emoji
+        document.getElementById('emojiPicker').addEventListener('click', (e) => {
+            if (e.target.classList.contains('emoji-btn')) {
+                selectedEmoji = e.target.dataset.emoji;
+                document.querySelectorAll('.emoji-btn').forEach(btn => {
+                    btn.classList.toggle('selected', btn === e.target);
+                });
+            }
+        });
+
+        function saveWorkflow() {
+            const name = document.getElementById('wfName').value.trim();
+            const url = document.getElementById('wfUrl').value.trim();
+            const color = document.getElementById('wfColor').value;
+
+            if (!name) {
+                showToast('Entre un nom', 'error');
+                return;
+            }
+            if (!url) {
+                showToast('Entre une URL webhook', 'error');
+                return;
+            }
+
+            workflows.push({ name, url, icon: selectedEmoji, color });
+            localStorage.setItem('n8n_workflows', JSON.stringify(workflows));
+
+            closeModal();
+            renderWorkflows();
+            showToast(`${name} ajoute`, 'success');
+        }
+
+        // Echapper le HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type = '') {
+            const oldToast = document.querySelector('.toast');
+            if (oldToast) oldToast.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Fermer avec Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // METEO (Open-Meteo API - gratuit, sans clé API)
+        // ═══════════════════════════════════════════════════════════════
+
+        const weatherIcons = {
+            0: '☀️',      // Clear sky
+            1: '🌤️',     // Mainly clear
+            2: '⛅',      // Partly cloudy
+            3: '☁️',      // Overcast
+            45: '🌫️',    // Fog
+            48: '🌫️',    // Depositing rime fog
+            51: '🌧️',    // Light drizzle
+            53: '🌧️',    // Moderate drizzle
+            55: '🌧️',    // Dense drizzle
+            61: '🌧️',    // Slight rain
+            63: '🌧️',    // Moderate rain
+            65: '🌧️',    // Heavy rain
+            71: '🌨️',    // Slight snow
+            73: '🌨️',    // Moderate snow
+            75: '❄️',     // Heavy snow
+            80: '🌦️',    // Slight rain showers
+            81: '🌦️',    // Moderate rain showers
+            82: '⛈️',    // Violent rain showers
+            95: '⛈️',    // Thunderstorm
+            96: '⛈️',    // Thunderstorm with hail
+            99: '⛈️',    // Thunderstorm with heavy hail
+        };
+
+        const weatherDescriptions = {
+            0: 'Ciel dégagé',
+            1: 'Peu nuageux',
+            2: 'Partiellement nuageux',
+            3: 'Couvert',
+            45: 'Brouillard',
+            48: 'Brouillard givrant',
+            51: 'Bruine légère',
+            53: 'Bruine modérée',
+            55: 'Bruine dense',
+            61: 'Pluie légère',
+            63: 'Pluie modérée',
+            65: 'Pluie forte',
+            71: 'Neige légère',
+            73: 'Neige modérée',
+            75: 'Neige forte',
+            80: 'Averses légères',
+            81: 'Averses modérées',
+            82: 'Averses violentes',
+            95: 'Orage',
+            96: 'Orage avec grêle',
+            99: 'Orage violent',
+        };
+
+        async function loadWeather() {
+            const weatherEl = document.getElementById('weather');
+            const tempEl = document.getElementById('weatherTemp');
+            const descEl = document.getElementById('weatherDesc');
+            const locationEl = document.getElementById('weatherLocation');
+            const iconEl = weatherEl.querySelector('.weather-icon');
+
+            try {
+                // Obtenir la position
+                const position = await new Promise((resolve, reject) => {
+                    if (!navigator.geolocation) {
+                        reject(new Error('Géolocalisation non supportée'));
+                        return;
+                    }
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: false,
+                        timeout: 10000,
+                        maximumAge: 600000 // Cache 10 min
+                    });
+                });
+
+                const { latitude, longitude } = position.coords;
+
+                // Appeler Open-Meteo API
+                const weatherRes = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&timezone=auto`
+                );
+                const weatherData = await weatherRes.json();
+
+                // Reverse geocoding pour le nom de la ville
+                const geoRes = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10`
+                );
+                const geoData = await geoRes.json();
+                const city = geoData.address?.city || geoData.address?.town || geoData.address?.village || geoData.address?.municipality || 'Position actuelle';
+
+                // Afficher les données
+                const temp = Math.round(weatherData.current.temperature_2m);
+                const code = weatherData.current.weather_code;
+
+                tempEl.textContent = `${temp}°C`;
+                descEl.textContent = weatherDescriptions[code] || 'Inconnu';
+                locationEl.innerHTML = `📍 ${city}`;
+                iconEl.textContent = weatherIcons[code] || '🌡️';
+
+                weatherEl.classList.remove('loading');
+
+            } catch (err) {
+                console.warn('Météo non disponible:', err.message);
+                tempEl.textContent = '--°';
+                descEl.textContent = 'Non disponible';
+                locationEl.textContent = '';
+                weatherEl.classList.remove('loading');
+            }
+        }
+
+        // Charger la météo au démarrage
+        loadWeather();
+
+        // ═══════════════════════════════════════════════════════════════
+        // STATUS WORKFLOWS N8N (via API) - Sidebar avec catégories
+        // ═══════════════════════════════════════════════════════════════
+
+        const N8N_BASE_URL = 'https://n8n.srv1230871.hstgr.cloud';
+        let n8nApiKey = localStorage.getItem('n8n_api_key') || '';
+
+        // Catégorisation des workflows
+        function categorizeWorkflow(name) {
+            const lower = name.toLowerCase();
+            // Trading
+            if (lower.includes('trade') || lower.includes('trading') || lower.includes('stock') ||
+                lower.includes('screen') || lower.includes('cac') || lower.includes('sbf') ||
+                lower.includes('s&p') || lower.includes('position') || lower.includes('signal') ||
+                lower.includes('market') || lower.includes('i_trade')) {
+                return 'trading';
+            }
+            // Perso
+            if (lower.includes('wish') || lower.includes('sortie') || lower.includes('culture') ||
+                lower.includes('brief') || lower.includes('morning') || lower.includes('perso') ||
+                lower.includes('price') || lower.includes('tracker')) {
+                return 'perso';
+            }
+            // @Work (par défaut)
+            return 'work';
+        }
+
+        // Toggle catégorie workflow (réduire/afficher)
+        function toggleWfCategory(categoryId) {
+            const category = document.getElementById(categoryId);
+            category.classList.toggle('collapsed');
+            // Sauvegarder l'état
+            const collapsed = JSON.parse(localStorage.getItem('wf_collapsed') || '{}');
+            collapsed[categoryId] = category.classList.contains('collapsed');
+            localStorage.setItem('wf_collapsed', JSON.stringify(collapsed));
+        }
+
+        // Restaurer l'état collapsed au chargement
+        function restoreWfCategoryStates() {
+            const collapsed = JSON.parse(localStorage.getItem('wf_collapsed') || '{}');
+            Object.keys(collapsed).forEach(id => {
+                if (collapsed[id]) {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('collapsed');
+                }
+            });
+        }
+        restoreWfCategoryStates();
+
+        async function loadWorkflowsStatus() {
+            const tradingList = document.getElementById('wfListTrading');
+            const persoList = document.getElementById('wfListPerso');
+            const workList = document.getElementById('wfListWork');
+            const lastUpdateEl = document.getElementById('statusLastUpdate');
+
+            if (!n8nApiKey) {
+                const configHtml = `
+                    <div class="wf-config">
+                        <span>🔑 Clé API requise</span>
+                        <input type="password" id="n8nApiKeyInput" placeholder="Clé API N8N" onkeypress="if(event.key==='Enter')saveN8NApiKey()">
+                        <button class="btn btn-primary" onclick="saveN8NApiKey()">Sauvegarder</button>
+                    </div>
+                `;
+                tradingList.innerHTML = configHtml;
+                persoList.innerHTML = '<div class="wf-empty">--</div>';
+                workList.innerHTML = '<div class="wf-empty">--</div>';
+                return;
+            }
+
+            try {
+                // Récupérer les workflows
+                const workflowsRes = await fetch(`${N8N_BASE_URL}/api/v1/workflows`, {
+                    headers: { 'X-N8N-API-KEY': n8nApiKey }
+                });
+
+                if (!workflowsRes.ok) {
+                    if (workflowsRes.status === 401) throw new Error('Clé invalide');
+                    throw new Error(`Erreur ${workflowsRes.status}`);
+                }
+
+                const workflowsData = await workflowsRes.json();
+                const allWorkflows = workflowsData.data || [];
+                const activeWorkflows = allWorkflows.filter(wf => wf.active);
+
+                // Récupérer les dernières exécutions
+                const executionsRes = await fetch(`${N8N_BASE_URL}/api/v1/executions?limit=200`, {
+                    headers: { 'X-N8N-API-KEY': n8nApiKey }
+                });
+                const executionsData = await executionsRes.json();
+                const executions = executionsData.data || [];
+
+                // Mapper les dernières exécutions par workflow
+                const lastExecutions = {};
+                executions.forEach(exec => {
+                    const wfId = exec.workflowId;
+                    if (!lastExecutions[wfId] || new Date(exec.startedAt) > new Date(lastExecutions[wfId].startedAt)) {
+                        lastExecutions[wfId] = exec;
+                    }
+                });
+
+                // Catégoriser les workflows
+                const categories = { trading: [], perso: [], work: [] };
+                activeWorkflows.forEach(wf => {
+                    const cat = categorizeWorkflow(wf.name);
+                    categories[cat].push(wf);
+                });
+
+                // Fonction pour générer une carte workflow - Format liste
+                function renderWfCard(wf) {
+                    const lastExec = lastExecutions[wf.id];
+                    const icon = getWorkflowIcon(wf.name);
+                    const badgeClass = lastExec ? (lastExec.status === 'success' ? 'ok' : lastExec.status === 'error' ? 'error' : 'actif') : 'actif';
+                    const badgeText = lastExec ? (lastExec.status === 'success' ? 'OK' : lastExec.status === 'error' ? 'ERR' : 'Actif') : 'Actif';
+                    const lastRunText = lastExec ? formatRelativeTime(lastExec.startedAt) : 'Jamais';
+
+                    return `
+                        <div class="wf-card" data-workflow-id="${wf.id}" title="${escapeHtml(wf.name)}">
+                            <div class="wf-icon">
+                                ${icon}
+                                <span class="wf-badge-dot ${badgeClass}"></span>
+                            </div>
+                            <div class="wf-info">
+                                <div class="wf-name">${escapeHtml(wf.name)}</div>
+                                <div class="wf-meta">
+                                    <span class="wf-badge ${badgeClass}">${badgeText}</span>
+                                    <span class="wf-time">• ${lastRunText}</span>
+                                </div>
+                            </div>
+                            <a href="${N8N_BASE_URL}/workflow/${wf.id}" target="_blank" class="wf-link" title="Ouvrir dans N8N">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    `;
+                }
+
+                // Rendre chaque catégorie
+                tradingList.innerHTML = categories.trading.length > 0
+                    ? categories.trading.map(renderWfCard).join('')
+                    : '<div class="wf-empty">Aucun workflow</div>';
+
+                persoList.innerHTML = categories.perso.length > 0
+                    ? categories.perso.map(renderWfCard).join('')
+                    : '<div class="wf-empty">Aucun workflow</div>';
+
+                workList.innerHTML = categories.work.length > 0
+                    ? categories.work.map(renderWfCard).join('')
+                    : '<div class="wf-empty">Aucun workflow</div>';
+
+                // Mettre à jour l'heure
+                lastUpdateEl.textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+            } catch (err) {
+                console.error('Erreur chargement status:', err);
+                const errorHtml = `
+                    <div class="wf-card" style="border-left: 3px solid #ff453a;">
+                        <div class="wf-icon">⚠️</div>
+                        <div class="wf-info">
+                            <div class="wf-name">${escapeHtml(err.message)}</div>
+                        </div>
+                    </div>
+                    ${err.message === 'Clé invalide' ? `
+                    <div class="wf-config" style="margin-top:10px;">
+                        <input type="password" id="n8nApiKeyInput" placeholder="Nouvelle clé API" onkeypress="if(event.key==='Enter')saveN8NApiKey()">
+                        <button class="btn btn-primary" onclick="saveN8NApiKey()">Sauvegarder</button>
+                    </div>
+                    ` : ''}
+                `;
+                tradingList.innerHTML = errorHtml;
+                persoList.innerHTML = '<div class="wf-empty">--</div>';
+                workList.innerHTML = '<div class="wf-empty">--</div>';
+            }
+        }
+
+        async function refreshAllWorkflows() {
+            const btn = document.getElementById('refreshAllBtn');
+            btn.classList.add('spinning');
+            await loadWorkflowsStatus();
+            btn.classList.remove('spinning');
+            showToast('Workflows synchronisés', 'success');
+        }
+
+        function saveN8NApiKey() {
+            const key = document.getElementById('n8nApiKeyInput').value.trim();
+            if (key) {
+                n8nApiKey = key;
+                localStorage.setItem('n8n_api_key', key);
+                loadWorkflowsStatus();
+                showToast('Clé API sauvegardée', 'success');
+            }
+        }
+
+        function getWorkflowIcon(name) {
+            const lower = name.toLowerCase();
+            if (lower.includes('brief')) return '📋';
+            if (lower.includes('trade') || lower.includes('stock') || lower.includes('market')) return '📈';
+            if (lower.includes('sortie') || lower.includes('culture') || lower.includes('event')) return '🎭';
+            if (lower.includes('wish') || lower.includes('shop')) return '🛒';
+            if (lower.includes('mail') || lower.includes('email')) return '📧';
+            if (lower.includes('telegram')) return '💬';
+            if (lower.includes('notion')) return '📝';
+            if (lower.includes('backup') || lower.includes('sync')) return '☁️';
+            return '⚡';
+        }
+
+        function formatRelativeTime(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'now';
+            if (diffMins < 60) return `${diffMins}m`;
+            if (diffHours < 24) return `${diffHours}h`;
+            if (diffDays === 1) return 'hier';
+            if (diffDays < 7) return `${diffDays}j`;
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        }
+
+        // Charger le status au démarrage
+        loadWorkflowsStatus();
+
+        // Rafraîchir toutes les 2 minutes
+        setInterval(loadWorkflowsStatus, 2 * 60 * 1000);
+
+    </script>
+</body>
+</html>
