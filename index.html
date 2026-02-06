@@ -2481,6 +2481,189 @@
         // Rafraîchir toutes les 2 minutes
         setInterval(loadWorkflowsStatus, 2 * 60 * 1000);
 
+        // ═══════════════════════════════════════════════════════════════
+        // POSITIONS ACTIVES (via Webhook N8N)
+        // ═══════════════════════════════════════════════════════════════
+
+        let positionsWebhookUrl = localStorage.getItem('positions_webhook_url') || '';
+
+        function savePositionsWebhookUrl() {
+            const url = document.getElementById('posWebhookInput').value.trim();
+            if (url) {
+                positionsWebhookUrl = url;
+                localStorage.setItem('positions_webhook_url', url);
+                loadPositions();
+                showToast('URL webhook positions sauvegardée', 'success');
+            }
+        }
+
+        async function loadPositions() {
+            const summaryEl = document.getElementById('positionsSummary');
+            const listEl = document.getElementById('positionsList');
+            const lastUpdateEl = document.getElementById('positionsLastUpdate');
+
+            if (!positionsWebhookUrl) {
+                summaryEl.innerHTML = '';
+                listEl.innerHTML = `
+                    <div class="pos-config">
+                        <span style="font-size:0.8rem;color:var(--text-muted)">🔗 URL Webhook Positions</span>
+                        <input type="text" id="posWebhookInput" placeholder="https://n8n.../webhook/positions-api"
+                            onkeypress="if(event.key==='Enter')savePositionsWebhookUrl()">
+                        <button class="btn btn-primary" onclick="savePositionsWebhookUrl()" style="font-size:0.75rem;padding:6px 16px;">Sauvegarder</button>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const res = await fetch(positionsWebhookUrl);
+                if (!res.ok) throw new Error(`Erreur ${res.status}`);
+                const data = await res.json();
+
+                renderPositionsSummary(data.resume, summaryEl);
+                renderPositionsList(data.positions, listEl);
+                lastUpdateEl.textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+            } catch (err) {
+                console.error('Erreur positions:', err);
+                summaryEl.innerHTML = '';
+                listEl.innerHTML = `
+                    <div class="pos-card" style="border-left:3px solid #ff453a;">
+                        <div class="pos-main">
+                            <div><span style="font-size:0.8rem;">⚠️ ${escapeHtml(err.message)}</span></div>
+                        </div>
+                    </div>
+                    <div class="pos-config" style="margin-top:8px;">
+                        <input type="text" id="posWebhookInput" value="${escapeHtml(positionsWebhookUrl)}"
+                            placeholder="URL webhook" onkeypress="if(event.key==='Enter')savePositionsWebhookUrl()">
+                        <button class="btn btn-primary" onclick="savePositionsWebhookUrl()" style="font-size:0.75rem;padding:6px 16px;">Mettre à jour</button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderPositionsSummary(resume, el) {
+            if (!resume) { el.innerHTML = ''; return; }
+            const plClass = resume.totalPL >= 0 ? 'positive' : 'negative';
+            const plSign = resume.totalPL >= 0 ? '+' : '';
+            el.innerHTML = `
+                <div class="pos-kpi">
+                    <div class="pos-kpi-label">Investi</div>
+                    <div class="pos-kpi-value">${formatMoney(resume.totalInvesti)}</div>
+                </div>
+                <div class="pos-kpi">
+                    <div class="pos-kpi-label">Valeur</div>
+                    <div class="pos-kpi-value">${formatMoney(resume.totalValeur)}</div>
+                </div>
+                <div class="pos-kpi">
+                    <div class="pos-kpi-label">P&L</div>
+                    <div class="pos-kpi-value ${plClass}">${plSign}${formatMoney(resume.totalPL)}</div>
+                </div>
+                <div class="pos-kpi">
+                    <div class="pos-kpi-label">Positions</div>
+                    <div class="pos-kpi-value">${resume.totalPositions}</div>
+                </div>
+            `;
+        }
+
+        function renderPositionsList(positions, el) {
+            if (!positions || positions.length === 0) {
+                el.innerHTML = '<div class="wf-empty">Aucune position ouverte</div>';
+                return;
+            }
+
+            el.innerHTML = positions.map(pos => {
+                const plClass = pos.plEuro >= 0 ? 'positive' : 'negative';
+                const plSign = pos.plEuro >= 0 ? '+' : '';
+                const sparklineSvg = pos.sparkline && pos.sparkline.length > 1
+                    ? drawSparkline(pos.sparkline, plClass === 'positive' ? '#30d158' : '#ff453a')
+                    : '';
+
+                return `
+                    <div class="pos-card">
+                        <div class="pos-main">
+                            <div class="pos-ticker-block">
+                                <div class="pos-ticker">${escapeHtml(pos.ticker)}</div>
+                                <div class="pos-nom">${escapeHtml(pos.nom)}</div>
+                            </div>
+                            <div class="pos-details">
+                                <div class="pos-detail">
+                                    <span class="pos-detail-label">Qté</span>
+                                    <span class="pos-detail-value">${pos.quantite}</span>
+                                </div>
+                                <div class="pos-detail">
+                                    <span class="pos-detail-label">PRU</span>
+                                    <span class="pos-detail-value">${pos.prixAchat.toFixed(2)}€</span>
+                                </div>
+                                <div class="pos-detail">
+                                    <span class="pos-detail-label">Actuel</span>
+                                    <span class="pos-detail-value">${pos.prixActuel.toFixed(2)}€</span>
+                                </div>
+                                <div class="pos-detail">
+                                    <span class="pos-detail-label">Val.</span>
+                                    <span class="pos-detail-value">${formatMoney(pos.valeurActuelle)}</span>
+                                </div>
+                            </div>
+                            <div class="pos-levels">
+                                <span class="pos-level stop" title="Stop Loss">SL ${pos.distanceStop.toFixed(1)}%</span>
+                                <span class="pos-level target" title="Objectif 1">TP ${pos.distanceObj1.toFixed(1)}%</span>
+                                <span class="pos-level date-info" title="Durée">${pos.dureeJours}j</span>
+                            </div>
+                        </div>
+                        <div class="pos-pl">
+                            <div class="pos-pl-euro ${plClass}">${plSign}${pos.plEuro.toFixed(0)}€</div>
+                            <div class="pos-pl-pct ${plClass}">${plSign}${pos.plPercent.toFixed(2)}%</div>
+                        </div>
+                        <div class="pos-sparkline">${sparklineSvg}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function drawSparkline(prices, color) {
+            const w = 80, h = 32;
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+            const range = max - min || 1;
+            const pad = 2;
+
+            const points = prices.map((p, i) => {
+                const x = pad + (i / (prices.length - 1)) * (w - 2 * pad);
+                const y = pad + (1 - (p - min) / range) * (h - 2 * pad);
+                return `${x.toFixed(1)},${y.toFixed(1)}`;
+            }).join(' ');
+
+            const lastPoint = points.split(' ').pop();
+            const fillPoints = `${pad},${h - pad} ${points} ${w - pad},${h - pad}`;
+
+            return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+                <polygon points="${fillPoints}" fill="${color}" opacity="0.1"/>
+                <polyline points="${points}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="${lastPoint.split(',')[0]}" cy="${lastPoint.split(',')[1]}" r="2" fill="${color}"/>
+            </svg>`;
+        }
+
+        function formatMoney(value) {
+            if (Math.abs(value) >= 1000) {
+                return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+            }
+            return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 }).format(value);
+        }
+
+        async function refreshPositions() {
+            const btn = document.getElementById('refreshPosBtn');
+            btn.classList.add('spinning');
+            await loadPositions();
+            btn.classList.remove('spinning');
+            showToast('Positions rafraîchies', 'success');
+        }
+
+        // Charger les positions au démarrage
+        loadPositions();
+
+        // Rafraîchir toutes les 5 minutes
+        setInterval(loadPositions, 5 * 60 * 1000);
+
     </script>
 </body>
 </html>
