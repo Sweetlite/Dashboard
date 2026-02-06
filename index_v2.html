@@ -1059,18 +1059,37 @@
         const weatherIcons = { 0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️', 71:'🌨️', 73:'🌨️', 75:'❄️', 80:'🌦️', 81:'🌦️', 82:'⛈️', 95:'⛈️', 96:'⛈️', 99:'⛈️' };
 
         async function loadWeather() {
+            let lat, lon, city;
             try {
-                const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { timeout: 10000 }));
-                const { latitude: lat, longitude: lon } = pos.coords;
+                // Try browser geolocation first
+                const pos = await new Promise((res, rej) => {
+                    if (!navigator.geolocation) return rej(new Error('no geolocation'));
+                    navigator.geolocation.getCurrentPosition(res, rej, { timeout: 8000, maximumAge: 600000 });
+                });
+                lat = pos.coords.latitude;
+                lon = pos.coords.longitude;
+            } catch (e) {
+                // Fallback: IP-based geolocation
+                try {
+                    const ipGeo = await fetch('https://ipapi.co/json/').then(r => r.json());
+                    lat = ipGeo.latitude;
+                    lon = ipGeo.longitude;
+                    city = ipGeo.city;
+                } catch (e2) {
+                    console.warn('Weather: no location available');
+                    return;
+                }
+            }
 
-                const [weather, geo] = await Promise.all([
-                    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code`).then(r => r.json()),
-                    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`).then(r => r.json())
-                ]);
+            try {
+                const weather = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code`).then(r => r.json());
+                if (!city) {
+                    const geo = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`).then(r => r.json());
+                    city = geo.address?.city || geo.address?.town || geo.address?.village || '--';
+                }
 
                 const temp = Math.round(weather.current.temperature_2m);
                 const code = weather.current.weather_code;
-                const city = geo.address?.city || geo.address?.town || geo.address?.village || '--';
 
                 document.querySelector('.weather-icon').textContent = weatherIcons[code] || '🌡️';
                 document.getElementById('weatherTemp').textContent = `${temp}°`;
