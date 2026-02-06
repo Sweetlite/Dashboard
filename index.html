@@ -2605,9 +2605,10 @@
                                 </div>
                             </div>
                             <div class="pos-levels">
-                                <span class="pos-level stop" title="Stop Loss">SL ${pos.distanceStop.toFixed(1)}%</span>
-                                <span class="pos-level target" title="Objectif 1">TP ${pos.distanceObj1.toFixed(1)}%</span>
-                                <span class="pos-level date-info" title="Durée">${pos.dureeJours}j</span>
+                                ${pos.distanceStop ? `<span class="pos-level stop" title="Stop Loss: ${pos.stopLoss}€">SL ${pos.distanceStop.toFixed(1)}%</span>` : ''}
+                                ${pos.distanceObj1 ? `<span class="pos-level target" title="Objectif 1: ${pos.objectif1}€">TP ${pos.distanceObj1.toFixed(1)}%</span>` : ''}
+                                ${pos.dureeJours ? `<span class="pos-level date-info" title="Durée de détention">${pos.dureeJours}j</span>` : ''}
+                                ${pos.marche ? `<span class="pos-level date-info" title="${pos.marche}">${pos.indice || pos.secteur || ''}</span>` : ''}
                             </div>
                         </div>
                         <div class="pos-pl">
