@@ -7,5 +7,7 @@
 			"path": "../Agent Linkedin"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "MyHomePage"
+	}
 }
