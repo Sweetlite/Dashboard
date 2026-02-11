@@ -1844,6 +1844,38 @@
             renderQuickActions();
         }
 
+        function deleteAction(idx) {
+            const actions = quickActionsData.length ? quickActionsData : defaultActions;
+            const action = actions[idx];
+            if (confirm(`Supprimer "${action.name}" ?`)) {
+                // If using defaults, copy them to quickActionsData first
+                if (!quickActionsData.length) {
+                    quickActionsData.push(...defaultActions);
+                }
+                quickActionsData.splice(idx, 1);
+                localStorage.setItem('quick_actions', JSON.stringify(quickActionsData));
+                renderQuickActions();
+            }
+        }
+
+        function editAction(idx) {
+            if (!editMode) return;
+            const actions = quickActionsData.length ? quickActionsData : defaultActions;
+            const action = actions[idx];
+            const name = prompt('Nom de l\'action:', action.name);
+            if (!name) return;
+            const icon = prompt('Emoji / SVG:', action.isSvg ? '⚡' : action.icon);
+            const url = prompt('URL Webhook:', action.url);
+            if (!url) return;
+            // If using defaults, copy them first
+            if (!quickActionsData.length) {
+                quickActionsData.push(...defaultActions);
+            }
+            quickActionsData[idx] = { name, icon, url };
+            localStorage.setItem('quick_actions', JSON.stringify(quickActionsData));
+            renderQuickActions();
+        }
+
         // ═══════════════════════════════════════════════════════════════
         // POSITIONS ACTIVES (via Webhook N8N)
         // ═══════════════════════════════════════════════════════════════
