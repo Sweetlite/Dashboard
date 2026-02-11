@@ -1009,79 +1009,8 @@
                 <input type="text" id="searchInput" placeholder="Rechercher sur Google...">
             </div>
 
-            <!-- Productivité -->
-            <section class="category">
-                <h2 class="category-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg> Productivité</h2>
-                <div class="apps-grid">
-                    <a href="https://github.com" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://github.githubassets.com/favicons/favicon-dark.svg" alt=""></div>
-                        <span class="app-name">GitHub</span>
-                    </a>
-                    <a href="https://n8n.srv1230871.hstgr.cloud/" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.google.com/s2/favicons?domain=n8n.io&sz=64" alt=""></div>
-                        <span class="app-name">N8N</span>
-                    </a>
-                    <a href="https://mail.google.com" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.gstatic.com/images/branding/product/2x/gmail_2020q4_48dp.png" alt=""></div>
-                        <span class="app-name">Gmail</span>
-                    </a>
-                    <a href="https://drive.google.com" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.gstatic.com/images/branding/product/2x/drive_2020q4_48dp.png" alt=""></div>
-                        <span class="app-name">Drive</span>
-                    </a>
-                    <a href="https://calendar.google.com" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.gstatic.com/images/branding/product/2x/calendar_2020q4_48dp.png" alt=""></div>
-                        <span class="app-name">Agenda</span>
-                    </a>
-                    <a href="https://notion.so" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.google.com/s2/favicons?domain=notion.so&sz=64" alt=""></div>
-                        <span class="app-name">Notion</span>
-                    </a>
-                    <a href="https://clients.boursobank.com/" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.google.com/s2/favicons?domain=boursorama.com&sz=64" alt=""></div>
-                        <span class="app-name">Boursorama</span>
-                    </a>
-                    <a href="https://tradingboard.boursobank.com/" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.google.com/s2/favicons?domain=tradingview.com&sz=64" alt=""></div>
-                        <span class="app-name">Trading</span>
-                    </a>
-                    <a href="https://app.raindrop.io/my/0" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.google.com/s2/favicons?domain=raindrop.io&sz=64" alt=""></div>
-                        <span class="app-name">Raindrop</span>
-                    </a>
-                    <a href="https://hpanel.hostinger.com/vps/1230871/overview" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.google.com/s2/favicons?domain=hostinger.com&sz=64" alt=""></div>
-                        <span class="app-name">Hostinger</span>
-                    </a>
-                    <a href="https://console.cloud.google.com/auth/clients?project=n8nbriefam" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.gstatic.com/images/branding/product/2x/cloud_64dp.png" alt=""></div>
-                        <span class="app-name">GCP</span>
-                    </a>
-                </div>
-            </section>
-
-            <!-- Personnel -->
-            <section class="category">
-                <h2 class="category-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Personnel</h2>
-                <div class="apps-grid">
-                    <a href="https://clients.boursobank.com/" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.google.com/s2/favicons?domain=boursorama.com&sz=64" alt=""></div>
-                        <span class="app-name">Boursorama</span>
-                    </a>
-                    <a href="https://mabanque.bnpparibas/" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.google.com/s2/favicons?domain=bnpparibas.com&sz=64" alt=""></div>
-                        <span class="app-name">BNP Paribas</span>
-                    </a>
-                    <a href="https://www.carrefour-banque.fr/espace-client/" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.google.com/s2/favicons?domain=carrefour-banque.fr&sz=64" alt=""></div>
-                        <span class="app-name">Carrefour Bank</span>
-                    </a>
-                    <a href="https://www.doctolib.fr/" target="_blank" class="app">
-                        <div class="app-icon"><img src="https://www.google.com/s2/favicons?domain=doctolib.fr&sz=64" alt=""></div>
-                        <span class="app-name">Doctolib</span>
-                    </a>
-                </div>
-            </section>
+            <!-- App Categories (rendered dynamically from config.json) -->
+            <div id="appCategories"></div>
 
             <!-- Positions Actives -->
             <section class="category" id="positionsSection">
