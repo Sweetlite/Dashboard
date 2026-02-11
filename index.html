@@ -1853,17 +1853,17 @@
         function renderQuickActions() {
             const actions = quickActionsData.length ? quickActionsData : defaultActions;
             document.getElementById('quickActions').innerHTML = actions.map((a, idx) => `
-                <button class="quick-action" id="qa-${idx}" onclick="${editMode ? `editAction(${idx})` : `runAction('${a.url}', ${idx})`}">
+                <div class="quick-action" id="qa-${idx}" onclick="${editMode ? `editAction(${idx})` : `runAction('${a.url}', ${idx})`}">
                     <span class="qa-status"></span>
-                    <button class="qa-delete" onclick="event.stopPropagation();deleteAction(${idx})" title="Supprimer">&times;</button>
+                    <span class="qa-delete" onclick="event.stopPropagation();deleteAction(${idx})" title="Supprimer">&times;</span>
                     <span class="quick-action-icon">${a.icon}</span>
                     <span class="quick-action-label">${a.name}</span>
-                </button>
+                </div>
             `).join('') + `
-                <button class="quick-action" onclick="addAction()" style="border: 1px dashed var(--border);">
+                <div class="quick-action" onclick="addAction()" style="border: 1px dashed var(--border);">
                     <span class="quick-action-icon">+</span>
                     <span class="quick-action-label">Ajouter</span>
-                </button>
+                </div>
             `;
         }
 
