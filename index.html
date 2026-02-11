@@ -897,6 +897,82 @@
         .app-add-icon { font-size: 1.5rem; margin-bottom: 4px; }
         .app-add-label { font-size: 0.7rem; font-weight: 500; }
 
+        /* Category edit controls */
+        .category-header-edit {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .category-edit-actions {
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+        body.editing .category-edit-actions { display: flex; }
+        .cat-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .cat-btn:hover { background: var(--bg-card); color: var(--text); }
+        .cat-btn.cat-delete:hover { color: var(--error); }
+        body.editing .category-title { cursor: pointer; }
+        body.editing .category-title:hover { color: var(--accent); }
+
+        /* Add category button */
+        .add-category {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: transparent;
+            width: 100%;
+            margin-top: 8px;
+        }
+        body.editing .add-category { display: flex; }
+        .add-category:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Category icon picker in modal */
+        .icon-picker {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .icon-option {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .icon-option:hover { border-color: var(--accent); color: var(--text); }
+        .icon-option.selected { border-color: var(--accent); background: rgba(59,130,246,0.1); color: var(--accent); }
+        .icon-option svg { stroke: currentColor; }
+
         /* Edit modal */
         .edit-modal-overlay {
             display: none;
