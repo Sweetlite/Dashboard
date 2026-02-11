@@ -983,8 +983,21 @@
                         <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
                     </div>
                 </label>
+                <button class="edit-toggle" id="editToggle" onclick="toggleEditMode()" title="Mode édition">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
             </div>
         </header>
+
+        <!-- Edit Mode Bar -->
+        <div class="edit-bar" id="editBar">
+            <span>Mode édition actif — cliquez sur un raccourci pour le modifier</span>
+            <div class="edit-bar-actions">
+                <button class="btn-download" onclick="downloadConfig()">Télécharger config</button>
+                <button class="btn-cancel" onclick="toggleEditMode()">Annuler</button>
+                <button class="btn-save" onclick="saveEdits()">Sauvegarder</button>
+            </div>
+        </div>
 
         <!-- MAIN CONTENT -->
         <main class="main">
