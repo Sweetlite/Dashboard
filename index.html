@@ -928,6 +928,37 @@
         body.editing .category-title { cursor: pointer; }
         body.editing .category-title:hover { color: var(--accent); }
 
+        /* Quick action delete button in edit mode */
+        body.editing .quick-action { position: relative; }
+        body.editing .quick-action::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-sm);
+            border: 2px dashed var(--accent);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .qa-delete {
+            display: none;
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--error);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.7rem;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            line-height: 1;
+        }
+        body.editing .qa-delete { display: flex; }
+
         /* Add category button */
         .add-category {
             display: none;
