@@ -1855,7 +1855,8 @@
         function renderQuickActions() {
             const actions = quickActionsData.length ? quickActionsData : defaultActions;
             document.getElementById('quickActions').innerHTML = actions.map((a, idx) => `
-                <button class="quick-action" onclick="${editMode ? `editAction(${idx})` : `runAction('${a.url}')`}">
+                <button class="quick-action" id="qa-${idx}" onclick="${editMode ? `editAction(${idx})` : `runAction('${a.url}', ${idx})`}">
+                    <span class="qa-status"></span>
                     <button class="qa-delete" onclick="event.stopPropagation();deleteAction(${idx})" title="Supprimer">&times;</button>
                     <span class="quick-action-icon">${a.icon}</span>
                     <span class="quick-action-label">${a.name}</span>
