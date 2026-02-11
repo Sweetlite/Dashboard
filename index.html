@@ -1283,6 +1283,87 @@
             });
         }
 
+        function editCategory(catIdx) {
+            const cat = appConfig.categories[catIdx];
+            showCategoryModal('Modifier la catégorie', cat.name, cat.icon, (name, icon) => {
+                appConfig.categories[catIdx].name = name;
+                appConfig.categories[catIdx].icon = icon;
+                renderAppCategories();
+            });
+        }
+
+        function deleteCategory(catIdx) {
+            const cat = appConfig.categories[catIdx];
+            if (confirm(`Supprimer la catégorie "${cat.name}" et tous ses raccourcis ?`)) {
+                appConfig.categories.splice(catIdx, 1);
+                renderAppCategories();
+            }
+        }
+
+        function addCategory() {
+            showCategoryModal('Nouvelle catégorie', '', 'grid', (name, icon) => {
+                appConfig.categories.push({ id: name.toLowerCase().replace(/[^a-z0-9]/g, '_'), name, icon, apps: [] });
+                renderAppCategories();
+            });
+        }
+
+        function showCategoryModal(title, name, selectedIcon, onSave) {
+            const overlay = document.getElementById('editModalOverlay');
+            const modal = overlay.querySelector('.edit-modal');
+
+            // Build icon picker HTML
+            const iconPickerHtml = Object.keys(categoryIcons).map(key =>
+                `<button type="button" class="icon-option ${key === selectedIcon ? 'selected' : ''}" data-icon="${key}" onclick="selectCatIcon(this)">${categoryIcons[key]}</button>`
+            ).join('');
+
+            modal.innerHTML = `
+                <h3>${title}</h3>
+                <label>Nom de la catégorie<input type="text" id="catModalName" placeholder="Ex: Finances" value="${name}"></label>
+                <label>Icône<div class="icon-picker" id="catIconPicker">${iconPickerHtml}</div></label>
+                <input type="hidden" id="catModalIcon" value="${selectedIcon}">
+                <div class="edit-modal-actions">
+                    <button class="btn-secondary" id="catModalCancel">Annuler</button>
+                    <button class="btn-primary" id="catModalSave">Enregistrer</button>
+                </div>
+            `;
+            overlay.classList.add('visible');
+
+            document.getElementById('catModalSave').onclick = () => {
+                const n = document.getElementById('catModalName').value.trim();
+                const ic = document.getElementById('catModalIcon').value;
+                if (n) {
+                    onSave(n, ic);
+                    overlay.classList.remove('visible');
+                    restoreAppModal();
+                }
+            };
+            document.getElementById('catModalCancel').onclick = () => {
+                overlay.classList.remove('visible');
+                restoreAppModal();
+            };
+        }
+
+        function selectCatIcon(el) {
+            el.closest('.icon-picker').querySelectorAll('.icon-option').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('catModalIcon').value = el.dataset.icon;
+        }
+
+        // Restore the modal to its default app-editing form
+        function restoreAppModal() {
+            const modal = document.querySelector('#editModalOverlay .edit-modal');
+            modal.innerHTML = `
+                <h3 id="modalTitle">Modifier le raccourci</h3>
+                <label>Nom<input type="text" id="modalName" placeholder="Ex: Gmail"></label>
+                <label>URL<input type="url" id="modalUrl" placeholder="https://..."></label>
+                <label>Icône (URL)<input type="text" id="modalIcon" placeholder="Auto-détecté depuis l'URL"></label>
+                <div class="edit-modal-actions">
+                    <button class="btn-secondary" id="modalCancel">Annuler</button>
+                    <button class="btn-primary" id="modalSave">Enregistrer</button>
+                </div>
+            `;
+        }
+
         function showModal(title, name, url, icon, onSave) {
             const overlay = document.getElementById('editModalOverlay');
             document.getElementById('modalTitle').textContent = title;
