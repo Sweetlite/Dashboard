@@ -1074,6 +1074,159 @@
         let apiKey = localStorage.getItem('n8n_api_key') || '';
 
         // ═══════════════════════════════════════════════════════════════
+        // APP CATEGORIES (from config.json + localStorage overrides)
+        // ═══════════════════════════════════════════════════════════════
+        const categoryIcons = {
+            briefcase: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>',
+            user: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+            chat: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/></svg>',
+            play: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+            wrench: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>',
+            star: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+            grid: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>'
+        };
+
+        let appConfig = null;
+        let editMode = false;
+
+        async function loadAppConfig() {
+            // Check localStorage for user overrides
+            const saved = localStorage.getItem('dashboard_config');
+            if (saved) {
+                try {
+                    appConfig = JSON.parse(saved);
+                    renderAppCategories();
+                    return;
+                } catch (e) {
+                    console.warn('Invalid saved config, loading from file');
+                }
+            }
+            // Load from config.json
+            try {
+                const res = await fetch('config.json');
+                appConfig = await res.json();
+                renderAppCategories();
+            } catch (e) {
+                console.error('Failed to load config.json:', e);
+            }
+        }
+
+        function renderAppCategories() {
+            const container = document.getElementById('appCategories');
+            if (!appConfig?.categories) return;
+
+            container.innerHTML = appConfig.categories.map((cat, catIdx) => {
+                const iconSvg = categoryIcons[cat.icon] || categoryIcons.grid;
+                const appsHtml = cat.apps.map((app, appIdx) => `
+                    <a href="${app.url}" target="_blank" class="app" data-cat="${catIdx}" data-app="${appIdx}" ${editMode ? 'onclick="editApp(event, ' + catIdx + ', ' + appIdx + ')"' : ''}>
+                        <button class="app-delete" onclick="deleteApp(event, ${catIdx}, ${appIdx})" title="Supprimer">&times;</button>
+                        <div class="app-icon"><img src="${app.icon}" alt="" onerror="this.parentElement.textContent='🔗'"></div>
+                        <span class="app-name">${app.name}</span>
+                    </a>
+                `).join('');
+
+                return `
+                    <section class="category">
+                        <h2 class="category-title">${iconSvg} ${cat.name}</h2>
+                        <div class="apps-grid">
+                            ${appsHtml}
+                            <button class="app-add" onclick="addApp(${catIdx})">
+                                <span class="app-add-icon">+</span>
+                                <span class="app-add-label">Ajouter</span>
+                            </button>
+                        </div>
+                    </section>
+                `;
+            }).join('');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // EDIT MODE
+        // ═══════════════════════════════════════════════════════════════
+        function toggleEditMode() {
+            editMode = !editMode;
+            document.body.classList.toggle('editing', editMode);
+            document.getElementById('editBar').classList.toggle('visible', editMode);
+            document.getElementById('editToggle').classList.toggle('active', editMode);
+            renderAppCategories();
+        }
+
+        function editApp(e, catIdx, appIdx) {
+            if (!editMode) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const app = appConfig.categories[catIdx].apps[appIdx];
+            showModal('Modifier le raccourci', app.name, app.url, app.icon, (name, url, icon) => {
+                appConfig.categories[catIdx].apps[appIdx] = { name, url, icon };
+                renderAppCategories();
+            });
+        }
+
+        function deleteApp(e, catIdx, appIdx) {
+            e.preventDefault();
+            e.stopPropagation();
+            const app = appConfig.categories[catIdx].apps[appIdx];
+            if (confirm(`Supprimer "${app.name}" ?`)) {
+                appConfig.categories[catIdx].apps.splice(appIdx, 1);
+                renderAppCategories();
+            }
+        }
+
+        function addApp(catIdx) {
+            showModal('Ajouter un raccourci', '', '', '', (name, url, icon) => {
+                appConfig.categories[catIdx].apps.push({ name, url, icon });
+                renderAppCategories();
+            });
+        }
+
+        function showModal(title, name, url, icon, onSave) {
+            const overlay = document.getElementById('editModalOverlay');
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalName').value = name;
+            document.getElementById('modalUrl').value = url;
+            document.getElementById('modalIcon').value = icon;
+            overlay.classList.add('visible');
+
+            // Auto-generate icon URL from domain
+            document.getElementById('modalUrl').oninput = function() {
+                try {
+                    const domain = new URL(this.value).hostname;
+                    if (!document.getElementById('modalIcon').value || document.getElementById('modalIcon').dataset.auto === 'true') {
+                        document.getElementById('modalIcon').value = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+                        document.getElementById('modalIcon').dataset.auto = 'true';
+                    }
+                } catch (e) {}
+            };
+
+            document.getElementById('modalSave').onclick = () => {
+                const n = document.getElementById('modalName').value.trim();
+                const u = document.getElementById('modalUrl').value.trim();
+                const i = document.getElementById('modalIcon').value.trim();
+                if (n && u) {
+                    const finalIcon = i || `https://www.google.com/s2/favicons?domain=${new URL(u).hostname}&sz=64`;
+                    onSave(n, u, finalIcon);
+                    overlay.classList.remove('visible');
+                }
+            };
+            document.getElementById('modalCancel').onclick = () => overlay.classList.remove('visible');
+        }
+
+        function saveEdits() {
+            localStorage.setItem('dashboard_config', JSON.stringify(appConfig));
+            toggleEditMode();
+        }
+
+        function downloadConfig() {
+            const blob = new Blob([JSON.stringify(appConfig, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
         // CLOCK & DATE
         // ═══════════════════════════════════════════════════════════════
         function updateClock() {
