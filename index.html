@@ -800,6 +800,162 @@
             .app-name { font-size: 0.65rem; }
             .wf-list { grid-template-columns: repeat(3, 1fr); }
         }
+
+        /* === EDIT MODE === */
+        .edit-toggle {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .edit-toggle:hover { background: var(--bg-card-hover); color: var(--text); }
+        .edit-toggle.active { background: var(--accent); color: white; }
+
+        .edit-bar {
+            display: none;
+            grid-column: 1 / -1;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: var(--accent);
+            border-radius: var(--radius-sm);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .edit-bar.visible { display: flex; }
+        .edit-bar-actions { display: flex; gap: 8px; }
+        .edit-bar button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .edit-bar .btn-save { background: white; color: var(--accent); }
+        .edit-bar .btn-cancel { background: rgba(255,255,255,0.2); color: white; }
+        .edit-bar .btn-download { background: rgba(255,255,255,0.2); color: white; }
+
+        /* Edit mode overlays on apps */
+        body.editing .app { position: relative; }
+        body.editing .app::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            border: 2px dashed var(--accent);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .app-delete {
+            display: none;
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--error);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.7rem;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            line-height: 1;
+        }
+        body.editing .app-delete { display: flex; }
+
+        .app-add {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1;
+            padding: 16px 12px;
+            background: transparent;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            font-family: inherit;
+        }
+        body.editing .app-add { display: flex; }
+        .app-add:hover { border-color: var(--accent); color: var(--accent); }
+        .app-add-icon { font-size: 1.5rem; margin-bottom: 4px; }
+        .app-add-label { font-size: 0.7rem; font-weight: 500; }
+
+        /* Edit modal */
+        .edit-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .edit-modal-overlay.visible { display: flex; }
+        .edit-modal {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .edit-modal h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .edit-modal label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .edit-modal input {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .edit-modal input:focus { border-color: var(--accent); }
+        .edit-modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        .edit-modal-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .edit-modal .btn-primary { background: var(--accent); color: white; }
+        .edit-modal .btn-secondary { background: var(--bg); color: var(--text-secondary); }
     </style>
 </head>
 <body>
