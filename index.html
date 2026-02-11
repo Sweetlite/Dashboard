@@ -1869,13 +1869,34 @@
             `;
         }
 
-        async function runAction(url) {
+        async function runAction(url, idx) {
+            const btn = document.getElementById(`qa-${idx}`);
+            if (!btn || btn.classList.contains('running')) return;
+
+            // Running state
+            btn.classList.remove('success', 'error');
+            btn.classList.add('running');
+            const iconEl = btn.querySelector('.quick-action-icon');
+            const origIcon = iconEl.innerHTML;
+            iconEl.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>';
+
             try {
-                await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
-                alert('Action lancée !');
+                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+                btn.classList.remove('running');
+                iconEl.innerHTML = origIcon;
+                if (res.ok) {
+                    btn.classList.add('success');
+                } else {
+                    btn.classList.add('error');
+                }
             } catch (e) {
-                alert('Erreur: ' + e.message);
+                btn.classList.remove('running');
+                iconEl.innerHTML = origIcon;
+                btn.classList.add('error');
             }
+
+            // Clear status after 5 seconds
+            setTimeout(() => btn.classList.remove('success', 'error'), 5000);
         }
 
         function addAction() {
