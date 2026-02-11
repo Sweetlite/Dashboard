@@ -1033,6 +1033,20 @@
 
         </main>
 
+        <!-- Edit Modal -->
+        <div class="edit-modal-overlay" id="editModalOverlay">
+            <div class="edit-modal">
+                <h3 id="modalTitle">Modifier le raccourci</h3>
+                <label>Nom<input type="text" id="modalName" placeholder="Ex: Gmail"></label>
+                <label>URL<input type="url" id="modalUrl" placeholder="https://..."></label>
+                <label>Icône (URL)<input type="text" id="modalIcon" placeholder="Auto-détecté depuis l'URL"></label>
+                <div class="edit-modal-actions">
+                    <button class="btn-secondary" id="modalCancel">Annuler</button>
+                    <button class="btn-primary" id="modalSave">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <!-- Quick Actions -->
