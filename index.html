@@ -842,6 +842,91 @@
             .wf-list { grid-template-columns: repeat(3, 1fr); }
         }
 
+        /* === TV DIRECT === */
+        .tv-section { margin-bottom: 8px; }
+        .tv-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+            padding: 4px 0;
+        }
+        .tv-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tv-header .category-title { margin-bottom: 0; cursor: pointer; }
+        .tv-live-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: white;
+            background: var(--error);
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            animation: tv-pulse 2s ease-in-out infinite;
+        }
+        @keyframes tv-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .tv-chevron {
+            color: var(--text-muted);
+            transition: transform 0.3s;
+        }
+        .tv-section.collapsed .tv-chevron { transform: rotate(-90deg); }
+        .tv-section.collapsed .tv-grid { display: none; }
+        .tv-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .tv-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .tv-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .tv-card-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .tv-mute-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: var(--bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .tv-mute-btn:hover { background: var(--bg-card-hover); color: var(--text); }
+        .tv-mute-btn.muted { color: var(--error); }
+        .tv-card iframe, .tv-card > div:last-child {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            display: block;
+            border: none;
+        }
+        .tv-card > div:last-child iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        @media (max-width: 1100px) { .tv-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .tv-grid { grid-template-columns: 1fr; } }
+
         /* === EDIT MODE === */
         .edit-toggle {
             width: 36px;
@@ -1159,6 +1244,49 @@
 
             <!-- App Categories (rendered dynamically from config.json) -->
             <div id="appCategories"></div>
+
+            <!-- TV Direct -->
+            <section class="tv-section collapsed" id="tvSection">
+                <div class="tv-header" onclick="toggleTvSection()">
+                    <div class="tv-header-left">
+                        <h2 class="category-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                            TV Direct
+                        </h2>
+                        <span class="tv-live-badge">LIVE</span>
+                    </div>
+                    <svg class="tv-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                </div>
+                <div class="tv-grid">
+                    <div class="tv-card">
+                        <div class="tv-card-header">
+                            <span class="tv-card-name">BFM TV</span>
+                            <button class="tv-mute-btn muted" id="tvMute-bfm" onclick="event.stopPropagation();toggleTvMute('bfm')" title="Son">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            </button>
+                        </div>
+                        <div id="tv-bfm"></div>
+                    </div>
+                    <div class="tv-card">
+                        <div class="tv-card-header">
+                            <span class="tv-card-name">CNews</span>
+                            <button class="tv-mute-btn muted" id="tvMute-cnews" onclick="event.stopPropagation();toggleTvMute('cnews')" title="Son">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            </button>
+                        </div>
+                        <iframe id="tv-cnews" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    </div>
+                    <div class="tv-card">
+                        <div class="tv-card-header">
+                            <span class="tv-card-name">LCI</span>
+                            <button class="tv-mute-btn muted" id="tvMute-lci" onclick="event.stopPropagation();toggleTvMute('lci')" title="Son">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            </button>
+                        </div>
+                        <div id="tv-lci"></div>
+                    </div>
+                </div>
+            </section>
 
             <!-- Positions Actives -->
             <section class="category" id="positionsSection">
@@ -2085,6 +2213,108 @@
             btn.classList.add('spinning');
             await loadPositions();
             btn.classList.remove('spinning');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // TV DIRECT
+        // ═══════════════════════════════════════════════════════════════
+        const tvChannels = {
+            bfm:   { type: 'yt', player: null },
+            cnews: { type: 'dm' },
+            lci:   { type: 'yt', player: null }
+        };
+        const tvMuteState = { bfm: true, cnews: true, lci: true };
+
+        const svgSpeaker = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08"/></svg>';
+        const svgMuted = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+
+        function toggleTvSection() {
+            const el = document.getElementById('tvSection');
+            el.classList.toggle('collapsed');
+            localStorage.setItem('tv_collapsed', el.classList.contains('collapsed'));
+            // Load iframes only when opening (lazy load)
+            if (!el.classList.contains('collapsed') && !tvChannels.bfm.loaded) {
+                initTvStreams();
+            }
+        }
+
+        function initTvStreams() {
+            // CNews via Dailymotion iframe
+            document.getElementById('tv-cnews').src = 'https://www.dailymotion.com/embed/video/x3b68jn?autoplay=1&mute=1&queue-autoplay-next=0&sharing-enable=0&ui-logo=0';
+
+            // YouTube IFrame API
+            const tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(tag);
+
+            window.onYouTubeIframeAPIReady = function() {
+                tvChannels.bfm.player = new YT.Player('tv-bfm', {
+                    height: '100%', width: '100%',
+                    playerVars: { autoplay: 1, mute: 1, playsinline: 1, rel: 0 },
+                    events: { onReady: function(e) { e.target.loadVideoByUrl('https://www.youtube.com/embed/live_stream?channel=UC4Pu9ZOEi5D1yVyNeU8J_vw'); } }
+                });
+                tvChannels.lci.player = new YT.Player('tv-lci', {
+                    height: '100%', width: '100%',
+                    playerVars: { autoplay: 1, mute: 1, playsinline: 1, rel: 0 },
+                    events: { onReady: function(e) { e.target.loadVideoByUrl('https://www.youtube.com/embed/live_stream?channel=UCewhc0fvja891XkpIPGRMxQ'); } }
+                });
+            };
+
+            tvChannels.bfm.loaded = true;
+        }
+
+        function toggleTvMute(ch) {
+            const wasMuted = tvMuteState[ch];
+
+            // Mute all others first (one audio at a time)
+            if (wasMuted) {
+                Object.keys(tvChannels).forEach(k => {
+                    if (k !== ch && !tvMuteState[k]) {
+                        muteChannel(k);
+                    }
+                });
+            }
+
+            // Toggle this channel
+            if (wasMuted) {
+                unmuteChannel(ch);
+            } else {
+                muteChannel(ch);
+            }
+        }
+
+        function muteChannel(ch) {
+            tvMuteState[ch] = true;
+            const btn = document.getElementById('tvMute-' + ch);
+            btn.classList.add('muted');
+            btn.innerHTML = svgMuted;
+
+            if (tvChannels[ch].type === 'yt' && tvChannels[ch].player?.mute) {
+                tvChannels[ch].player.mute();
+            } else if (tvChannels[ch].type === 'dm') {
+                const iframe = document.getElementById('tv-cnews');
+                iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [true] }), '*');
+            }
+        }
+
+        function unmuteChannel(ch) {
+            tvMuteState[ch] = false;
+            const btn = document.getElementById('tvMute-' + ch);
+            btn.classList.remove('muted');
+            btn.innerHTML = svgSpeaker;
+
+            if (tvChannels[ch].type === 'yt' && tvChannels[ch].player?.unMute) {
+                tvChannels[ch].player.unMute();
+            } else if (tvChannels[ch].type === 'dm') {
+                const iframe = document.getElementById('tv-cnews');
+                iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [false] }), '*');
+            }
+        }
+
+        // Restore TV section state
+        if (localStorage.getItem('tv_collapsed') === 'false') {
+            document.getElementById('tvSection').classList.remove('collapsed');
+            initTvStreams();
         }
 
         // ═══════════════════════════════════════════════════════════════
