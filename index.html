@@ -6,6 +6,7 @@
     <title>Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root {
             --bg: #0a0a0a;
@@ -1265,8 +1266,11 @@
                     <div class="tv-card">
                         <div class="tv-card-header">
                             <span class="tv-card-name">LCI</span>
+                            <button class="tv-mute-btn muted" id="tvMute-lci" onclick="event.stopPropagation();toggleTvMute('lci')" title="Son">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            </button>
                         </div>
-                        <iframe id="tv-lci" src="" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share" allowfullscreen></iframe>
+                        <video id="tv-lci" muted playsinline style="width:100%;height:100%;object-fit:cover;background:#000"></video>
                     </div>
                     <div class="tv-card">
                         <div class="tv-card-header">
@@ -2230,11 +2234,11 @@
         // ═══════════════════════════════════════════════════════════════
         const tvChannels = {
             bfm:        { bcUrl: 'https://players.brightcove.net/876450610001/19dszYXgm_default/index.html?videoId=6346069778112', iframeId: 'tv-bfm' },
-            lci:        { embedUrl: 'https://www.tf1info.fr/direct/', iframeId: 'tv-lci' },
+            lci:        { hlsUrl: 'https://lci-hls-live-ssl.tf1.fr/lci/1/hls/live_2328.m3u8', videoId: 'tv-lci' },
             cnews:      { dmId: 'x3b68jn', iframeId: 'tv-cnews' },
             franceinfo: { dmId: 'x4rdeu6', iframeId: 'tv-franceinfo' }
         };
-        const tvMuteState = { bfm: true, cnews: true, franceinfo: true };
+        const tvMuteState = { bfm: true, lci: true, cnews: true, franceinfo: true };
         let tvLoaded = false;
 
         const svgSpeaker = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08"/></svg>';
@@ -2249,15 +2253,33 @@
             }
         }
 
+        let hlsPlayer = null;
+
         function initTvStreams() {
             Object.entries(tvChannels).forEach(([key, ch]) => {
-                const el = document.getElementById(ch.iframeId);
-                if (ch.bcUrl) {
-                    el.src = ch.bcUrl;
-                } else if (ch.embedUrl) {
-                    el.src = ch.embedUrl;
-                } else if (ch.dmId) {
-                    el.src = `https://geo.dailymotion.com/player.html?video=${ch.dmId}&mute=true`;
+                if (ch.hlsUrl) {
+                    const video = document.getElementById(ch.videoId);
+                    if (Hls.isSupported()) {
+                        hlsPlayer = new Hls();
+                        hlsPlayer.loadSource(ch.hlsUrl);
+                        hlsPlayer.attachMedia(video);
+                        hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                            video.play().catch(() => {});
+                        });
+                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                        // Safari native HLS
+                        video.src = ch.hlsUrl;
+                        video.addEventListener('loadedmetadata', () => {
+                            video.play().catch(() => {});
+                        });
+                    }
+                } else {
+                    const el = document.getElementById(ch.iframeId);
+                    if (ch.bcUrl) {
+                        el.src = ch.bcUrl;
+                    } else if (ch.dmId) {
+                        el.src = `https://geo.dailymotion.com/player.html?video=${ch.dmId}&mute=true`;
+                    }
                 }
             });
             tvLoaded = true;
@@ -2281,9 +2303,14 @@
             btn.classList.add('muted');
             btn.innerHTML = svgMuted;
             const channel = tvChannels[ch];
-            const iframe = document.getElementById(channel.iframeId);
-            if (iframe?.contentWindow && channel.dmId) {
-                iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [true] }), '*');
+            if (channel.hlsUrl) {
+                const video = document.getElementById(channel.videoId);
+                if (video) video.muted = true;
+            } else {
+                const iframe = document.getElementById(channel.iframeId);
+                if (iframe?.contentWindow && channel.dmId) {
+                    iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [true] }), '*');
+                }
             }
         }
 
@@ -2294,9 +2321,14 @@
             btn.classList.remove('muted');
             btn.innerHTML = svgSpeaker;
             const channel = tvChannels[ch];
-            const iframe = document.getElementById(channel.iframeId);
-            if (iframe?.contentWindow && channel.dmId) {
-                iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [false] }), '*');
+            if (channel.hlsUrl) {
+                const video = document.getElementById(channel.videoId);
+                if (video) video.muted = false;
+            } else {
+                const iframe = document.getElementById(channel.iframeId);
+                if (iframe?.contentWindow && channel.dmId) {
+                    iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [false] }), '*');
+                }
             }
         }
 
