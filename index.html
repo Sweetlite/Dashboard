@@ -913,15 +913,10 @@
         }
         .tv-mute-btn:hover { background: var(--bg-card-hover); color: var(--text); }
         .tv-mute-btn.muted { color: var(--error); }
-        .tv-card iframe, .tv-card > div:last-child {
+        .tv-card iframe {
             width: 100%;
             aspect-ratio: 16 / 9;
             display: block;
-            border: none;
-        }
-        .tv-card > div:last-child iframe {
-            width: 100%;
-            height: 100%;
             border: none;
         }
         @media (max-width: 1100px) { .tv-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -1265,7 +1260,7 @@
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
                             </button>
                         </div>
-                        <div id="tv-bfm"></div>
+                        <iframe id="tv-bfm" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                     </div>
                     <div class="tv-card">
                         <div class="tv-card-header">
@@ -1278,12 +1273,12 @@
                     </div>
                     <div class="tv-card">
                         <div class="tv-card-header">
-                            <span class="tv-card-name">LCI</span>
-                            <button class="tv-mute-btn muted" id="tvMute-lci" onclick="event.stopPropagation();toggleTvMute('lci')" title="Son">
+                            <span class="tv-card-name">franceinfo</span>
+                            <button class="tv-mute-btn muted" id="tvMute-franceinfo" onclick="event.stopPropagation();toggleTvMute('franceinfo')" title="Son">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
                             </button>
                         </div>
-                        <div id="tv-lci"></div>
+                        <iframe id="tv-franceinfo" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                     </div>
                 </div>
             </section>
@@ -2216,14 +2211,15 @@
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // TV DIRECT
+        // TV DIRECT (all Dailymotion)
         // ═══════════════════════════════════════════════════════════════
         const tvChannels = {
-            bfm:   { type: 'yt', player: null },
-            cnews: { type: 'dm' },
-            lci:   { type: 'yt', player: null }
+            bfm:        { dmId: 'xgz4t1',  iframeId: 'tv-bfm' },
+            cnews:      { dmId: 'x3b68jn', iframeId: 'tv-cnews' },
+            franceinfo: { dmId: 'x4rdeu6', iframeId: 'tv-franceinfo' }
         };
-        const tvMuteState = { bfm: true, cnews: true, lci: true };
+        const tvMuteState = { bfm: true, cnews: true, franceinfo: true };
+        let tvLoaded = false;
 
         const svgSpeaker = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08"/></svg>';
         const svgMuted = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
@@ -2232,54 +2228,34 @@
             const el = document.getElementById('tvSection');
             el.classList.toggle('collapsed');
             localStorage.setItem('tv_collapsed', el.classList.contains('collapsed'));
-            // Load iframes only when opening (lazy load)
-            if (!el.classList.contains('collapsed') && !tvChannels.bfm.loaded) {
+            if (!el.classList.contains('collapsed') && !tvLoaded) {
                 initTvStreams();
             }
         }
 
         function initTvStreams() {
-            // CNews via Dailymotion iframe
-            document.getElementById('tv-cnews').src = 'https://www.dailymotion.com/embed/video/x3b68jn?autoplay=1&mute=1&queue-autoplay-next=0&sharing-enable=0&ui-logo=0';
-
-            // YouTube IFrame API
-            const tag = document.createElement('script');
-            tag.src = 'https://www.youtube.com/iframe_api';
-            document.head.appendChild(tag);
-
-            window.onYouTubeIframeAPIReady = function() {
-                tvChannels.bfm.player = new YT.Player('tv-bfm', {
-                    height: '100%', width: '100%',
-                    playerVars: { autoplay: 1, mute: 1, playsinline: 1, rel: 0 },
-                    events: { onReady: function(e) { e.target.loadVideoByUrl('https://www.youtube.com/embed/live_stream?channel=UC4Pu9ZOEi5D1yVyNeU8J_vw'); } }
-                });
-                tvChannels.lci.player = new YT.Player('tv-lci', {
-                    height: '100%', width: '100%',
-                    playerVars: { autoplay: 1, mute: 1, playsinline: 1, rel: 0 },
-                    events: { onReady: function(e) { e.target.loadVideoByUrl('https://www.youtube.com/embed/live_stream?channel=UCewhc0fvja891XkpIPGRMxQ'); } }
-                });
-            };
-
-            tvChannels.bfm.loaded = true;
+            const dmParams = 'autoplay=1&mute=1&queue-autoplay-next=0&sharing-enable=0&ui-logo=0';
+            Object.values(tvChannels).forEach(ch => {
+                document.getElementById(ch.iframeId).src = `https://www.dailymotion.com/embed/video/${ch.dmId}?${dmParams}`;
+            });
+            tvLoaded = true;
         }
 
         function toggleTvMute(ch) {
             const wasMuted = tvMuteState[ch];
-
             // Mute all others first (one audio at a time)
             if (wasMuted) {
                 Object.keys(tvChannels).forEach(k => {
-                    if (k !== ch && !tvMuteState[k]) {
-                        muteChannel(k);
-                    }
+                    if (k !== ch && !tvMuteState[k]) muteChannel(k);
                 });
             }
+            wasMuted ? unmuteChannel(ch) : muteChannel(ch);
+        }
 
-            // Toggle this channel
-            if (wasMuted) {
-                unmuteChannel(ch);
-            } else {
-                muteChannel(ch);
+        function dmPostMessage(ch, muted) {
+            const iframe = document.getElementById(tvChannels[ch].iframeId);
+            if (iframe?.contentWindow) {
+                iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [muted] }), '*');
             }
         }
 
@@ -2288,13 +2264,7 @@
             const btn = document.getElementById('tvMute-' + ch);
             btn.classList.add('muted');
             btn.innerHTML = svgMuted;
-
-            if (tvChannels[ch].type === 'yt' && tvChannels[ch].player?.mute) {
-                tvChannels[ch].player.mute();
-            } else if (tvChannels[ch].type === 'dm') {
-                const iframe = document.getElementById('tv-cnews');
-                iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [true] }), '*');
-            }
+            dmPostMessage(ch, true);
         }
 
         function unmuteChannel(ch) {
@@ -2302,13 +2272,7 @@
             const btn = document.getElementById('tvMute-' + ch);
             btn.classList.remove('muted');
             btn.innerHTML = svgSpeaker;
-
-            if (tvChannels[ch].type === 'yt' && tvChannels[ch].player?.unMute) {
-                tvChannels[ch].player.unMute();
-            } else if (tvChannels[ch].type === 'dm') {
-                const iframe = document.getElementById('tv-cnews');
-                iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [false] }), '*');
-            }
+            dmPostMessage(ch, false);
         }
 
         // Restore TV section state
