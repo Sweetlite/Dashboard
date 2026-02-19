@@ -1255,12 +1255,21 @@
                 <div class="tv-grid">
                     <div class="tv-card">
                         <div class="tv-card-header">
-                            <span class="tv-card-name">BFM TV</span>
-                            <button class="tv-mute-btn muted" id="tvMute-bfm" onclick="event.stopPropagation();toggleTvMute('bfm')" title="Son">
+                            <span class="tv-card-name">CNN</span>
+                            <button class="tv-mute-btn muted" id="tvMute-cnn" onclick="event.stopPropagation();toggleTvMute('cnn')" title="Son">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
                             </button>
                         </div>
-                        <iframe id="tv-bfm" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        <iframe id="tv-cnn" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    </div>
+                    <div class="tv-card">
+                        <div class="tv-card-header">
+                            <span class="tv-card-name">Fox News</span>
+                            <button class="tv-mute-btn muted" id="tvMute-foxnews" onclick="event.stopPropagation();toggleTvMute('foxnews')" title="Son">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            </button>
+                        </div>
+                        <iframe id="tv-foxnews" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                     </div>
                     <div class="tv-card">
                         <div class="tv-card-header">
@@ -1279,15 +1288,6 @@
                             </button>
                         </div>
                         <iframe id="tv-franceinfo" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                    </div>
-                    <div class="tv-card">
-                        <div class="tv-card-header">
-                            <span class="tv-card-name">LCI</span>
-                            <button class="tv-mute-btn muted" id="tvMute-lci" onclick="event.stopPropagation();toggleTvMute('lci')" title="Son">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-                            </button>
-                        </div>
-                        <iframe id="tv-lci" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                     </div>
                 </div>
             </section>
@@ -2232,12 +2232,12 @@
         // TV DIRECT (all Dailymotion)
         // ═══════════════════════════════════════════════════════════════
         const tvChannels = {
-            bfm:        { dmId: 'xgz4t1',  iframeId: 'tv-bfm' },
+            cnn:        { dmId: null,       iframeId: 'tv-cnn',        ytChannel: 'UCupvZG-5ko_eiXAupbDfxWw' },
+            foxnews:    { dmId: null,       iframeId: 'tv-foxnews',    ytChannel: 'UCXIJgqnII2ZOINSWNOGFThA' },
             cnews:      { dmId: 'x3b68jn', iframeId: 'tv-cnews' },
-            franceinfo: { dmId: 'x4rdeu6', iframeId: 'tv-franceinfo' },
-            lci:        { dmId: null,       iframeId: 'tv-lci', ytChannel: 'UCewhc0fvja891XkpIPGRMxQ' }
+            franceinfo: { dmId: 'x4rdeu6', iframeId: 'tv-franceinfo' }
         };
-        const tvMuteState = { bfm: true, cnews: true, franceinfo: true, lci: true };
+        const tvMuteState = { cnn: true, foxnews: true, cnews: true, franceinfo: true };
         let tvLoaded = false;
 
         const svgSpeaker = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08"/></svg>';
