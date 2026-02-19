@@ -2234,7 +2234,7 @@
         // ═══════════════════════════════════════════════════════════════
         const tvChannels = {
             bfm:        { bcUrl: 'https://players.brightcove.net/876450610001/19dszYXgm_default/index.html?videoId=6346069778112', iframeId: 'tv-bfm' },
-            lci:        { hlsUrl: 'https://lci-hls-live-ssl.tf1.fr/lci/1/hls/live_2328.m3u8', videoId: 'tv-lci' },
+            lci:        { tf1Api: 'L_LCI', videoId: 'tv-lci' },
             cnews:      { dmId: 'x3b68jn', iframeId: 'tv-cnews' },
             franceinfo: { dmId: 'x4rdeu6', iframeId: 'tv-franceinfo' }
         };
@@ -2255,24 +2255,40 @@
 
         let hlsPlayer = null;
 
+        async function initLciStream() {
+            const ch = tvChannels.lci;
+            const video = document.getElementById(ch.videoId);
+            try {
+                const res = await fetch(`https://mediainfo.tf1.fr/mediainfocombo/${ch.tf1Api}?context=MYTF1&pver=5015000`);
+                const data = await res.json();
+                const hlsUrl = data?.delivery?.url;
+                if (!hlsUrl) return;
+                if (Hls.isSupported()) {
+                    hlsPlayer = new Hls({ maxBufferLength: 10, maxMaxBufferLength: 30 });
+                    hlsPlayer.loadSource(hlsUrl);
+                    hlsPlayer.attachMedia(video);
+                    hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                        video.play().catch(() => {});
+                    });
+                    hlsPlayer.on(Hls.Events.ERROR, (_, d) => {
+                        if (d.fatal && d.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                            // Token expired - refetch
+                            setTimeout(() => { hlsPlayer.destroy(); initLciStream(); }, 2000);
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = hlsUrl;
+                    video.addEventListener('loadedmetadata', () => video.play().catch(() => {}));
+                }
+            } catch (e) {
+                console.error('LCI stream error:', e);
+            }
+        }
+
         function initTvStreams() {
             Object.entries(tvChannels).forEach(([key, ch]) => {
-                if (ch.hlsUrl) {
-                    const video = document.getElementById(ch.videoId);
-                    if (Hls.isSupported()) {
-                        hlsPlayer = new Hls();
-                        hlsPlayer.loadSource(ch.hlsUrl);
-                        hlsPlayer.attachMedia(video);
-                        hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-                            video.play().catch(() => {});
-                        });
-                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                        // Safari native HLS
-                        video.src = ch.hlsUrl;
-                        video.addEventListener('loadedmetadata', () => {
-                            video.play().catch(() => {});
-                        });
-                    }
+                if (ch.tf1Api) {
+                    initLciStream();
                 } else {
                     const el = document.getElementById(ch.iframeId);
                     if (ch.bcUrl) {
