@@ -877,7 +877,7 @@
         .tv-section.collapsed .tv-grid { display: none; }
         .tv-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             margin-top: 12px;
         }
@@ -1279,6 +1279,15 @@
                             </button>
                         </div>
                         <iframe id="tv-franceinfo" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    </div>
+                    <div class="tv-card">
+                        <div class="tv-card-header">
+                            <span class="tv-card-name">LCI</span>
+                            <button class="tv-mute-btn muted" id="tvMute-lci" onclick="event.stopPropagation();toggleTvMute('lci')" title="Son">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            </button>
+                        </div>
+                        <iframe id="tv-lci" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                     </div>
                 </div>
             </section>
@@ -2216,9 +2225,10 @@
         const tvChannels = {
             bfm:        { dmId: 'xgz4t1',  iframeId: 'tv-bfm' },
             cnews:      { dmId: 'x3b68jn', iframeId: 'tv-cnews' },
-            franceinfo: { dmId: 'x4rdeu6', iframeId: 'tv-franceinfo' }
+            franceinfo: { dmId: 'x4rdeu6', iframeId: 'tv-franceinfo' },
+            lci:        { dmId: null,       iframeId: 'tv-lci', ytChannel: 'UCewhc0fvja891XkpIPGRMxQ' }
         };
-        const tvMuteState = { bfm: true, cnews: true, franceinfo: true };
+        const tvMuteState = { bfm: true, cnews: true, franceinfo: true, lci: true };
         let tvLoaded = false;
 
         const svgSpeaker = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08"/></svg>';
@@ -2234,9 +2244,12 @@
         }
 
         function initTvStreams() {
-            const dmParams = 'autoplay=1&mute=1&queue-autoplay-next=0&sharing-enable=0&ui-logo=0';
-            Object.values(tvChannels).forEach(ch => {
-                document.getElementById(ch.iframeId).src = `https://www.dailymotion.com/embed/video/${ch.dmId}?${dmParams}`;
+            Object.entries(tvChannels).forEach(([key, ch]) => {
+                if (ch.dmId) {
+                    document.getElementById(ch.iframeId).src = `https://geo.dailymotion.com/player.html?video=${ch.dmId}&mute=true`;
+                } else if (ch.ytChannel) {
+                    document.getElementById(ch.iframeId).src = `https://www.youtube.com/embed/live_stream?channel=${ch.ytChannel}&autoplay=1&mute=1`;
+                }
             });
             tvLoaded = true;
         }
@@ -2252,10 +2265,19 @@
             wasMuted ? unmuteChannel(ch) : muteChannel(ch);
         }
 
-        function dmPostMessage(ch, muted) {
-            const iframe = document.getElementById(tvChannels[ch].iframeId);
-            if (iframe?.contentWindow) {
-                iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [muted] }), '*');
+        function tvPostMessage(ch, muted) {
+            const channel = tvChannels[ch];
+            const iframe = document.getElementById(channel.iframeId);
+            if (!iframe?.contentWindow) return;
+            if (channel.dmId) {
+                // Dailymotion: reload with updated mute param
+                const url = new URL(iframe.src);
+                url.searchParams.set('mute', muted);
+                iframe.src = url.toString();
+            } else if (channel.ytChannel) {
+                // YouTube: use postMessage API
+                const cmd = muted ? 'mute' : 'unMute';
+                iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: cmd, args: [] }), '*');
             }
         }
 
@@ -2264,7 +2286,7 @@
             const btn = document.getElementById('tvMute-' + ch);
             btn.classList.add('muted');
             btn.innerHTML = svgMuted;
-            dmPostMessage(ch, true);
+            tvPostMessage(ch, true);
         }
 
         function unmuteChannel(ch) {
@@ -2272,7 +2294,7 @@
             const btn = document.getElementById('tvMute-' + ch);
             btn.classList.remove('muted');
             btn.innerHTML = svgSpeaker;
-            dmPostMessage(ch, false);
+            tvPostMessage(ch, false);
         }
 
         // Restore TV section state
