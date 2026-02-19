@@ -2223,7 +2223,7 @@
         // TV DIRECT
         // ═══════════════════════════════════════════════════════════════
         const tvChannels = {
-            bfm:        { dmId: 'xgz4t1',  iframeId: 'tv-bfm' },
+            bfm:        { bcUrl: 'https://players.brightcove.net/876450610001/19dszYXgm_default/index.html?videoId=6346069778112', iframeId: 'tv-bfm' },
             cnews:      { dmId: 'x3b68jn', iframeId: 'tv-cnews' },
             franceinfo: { dmId: 'x4rdeu6', iframeId: 'tv-franceinfo' }
         };
@@ -2244,7 +2244,9 @@
 
         function initTvStreams() {
             Object.entries(tvChannels).forEach(([key, ch]) => {
-                if (ch.dmId) {
+                if (ch.bcUrl) {
+                    document.getElementById(ch.iframeId).src = ch.bcUrl;
+                } else if (ch.dmId) {
                     document.getElementById(ch.iframeId).src = `https://geo.dailymotion.com/player.html?video=${ch.dmId}&mute=true`;
                 }
             });
