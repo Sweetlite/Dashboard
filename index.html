@@ -1384,25 +1384,34 @@
         let editMode = false;
 
         async function loadAppConfig() {
+            let fileConfig = null;
+            // Always fetch config.json to check version
+            try {
+                const res = await fetch('config.json?_=' + Date.now());
+                fileConfig = await res.json();
+            } catch (e) {
+                console.error('Failed to load config.json:', e);
+            }
             // Check localStorage for user overrides
             const saved = localStorage.getItem('dashboard_config');
             if (saved) {
                 try {
-                    appConfig = JSON.parse(saved);
-                    renderAppCategories();
-                    return;
+                    const savedConfig = JSON.parse(saved);
+                    // If config.json has a newer version, replace localStorage
+                    if (fileConfig && (!savedConfig.version || savedConfig.version < fileConfig.version)) {
+                        appConfig = fileConfig;
+                        localStorage.setItem('dashboard_config', JSON.stringify(fileConfig));
+                    } else {
+                        appConfig = savedConfig;
+                    }
                 } catch (e) {
-                    console.warn('Invalid saved config, loading from file');
+                    console.warn('Invalid saved config, using file');
+                    if (fileConfig) appConfig = fileConfig;
                 }
+            } else if (fileConfig) {
+                appConfig = fileConfig;
             }
-            // Load from config.json
-            try {
-                const res = await fetch('config.json');
-                appConfig = await res.json();
-                renderAppCategories();
-            } catch (e) {
-                console.error('Failed to load config.json:', e);
-            }
+            renderAppCategories();
         }
 
         function renderAppCategories() {
