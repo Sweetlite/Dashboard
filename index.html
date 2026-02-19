@@ -877,7 +877,7 @@
         .tv-section.collapsed .tv-grid { display: none; }
         .tv-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin-top: 12px;
         }
@@ -1255,12 +1255,21 @@
                 <div class="tv-grid">
                     <div class="tv-card">
                         <div class="tv-card-header">
+                            <span class="tv-card-name">BFM TV</span>
+                            <button class="tv-mute-btn muted" id="tvMute-bfm" onclick="event.stopPropagation();toggleTvMute('bfm')" title="Son">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            </button>
+                        </div>
+                        <iframe id="tv-bfm" src="" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                    <div class="tv-card">
+                        <div class="tv-card-header">
                             <span class="tv-card-name">CNews</span>
                             <button class="tv-mute-btn muted" id="tvMute-cnews" onclick="event.stopPropagation();toggleTvMute('cnews')" title="Son">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
                             </button>
                         </div>
-                        <iframe id="tv-cnews" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        <iframe id="tv-cnews" src="" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
                     <div class="tv-card">
                         <div class="tv-card-header">
@@ -1269,7 +1278,7 @@
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
                             </button>
                         </div>
-                        <iframe id="tv-franceinfo" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        <iframe id="tv-franceinfo" src="" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
                 </div>
             </section>
@@ -2214,10 +2223,11 @@
         // TV DIRECT
         // ═══════════════════════════════════════════════════════════════
         const tvChannels = {
+            bfm:        { dmId: 'xgz4t1',  iframeId: 'tv-bfm' },
             cnews:      { dmId: 'x3b68jn', iframeId: 'tv-cnews' },
             franceinfo: { dmId: 'x4rdeu6', iframeId: 'tv-franceinfo' }
         };
-        const tvMuteState = { cnews: true, franceinfo: true };
+        const tvMuteState = { bfm: true, cnews: true, franceinfo: true };
         let tvLoaded = false;
 
         const svgSpeaker = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08"/></svg>';
@@ -2235,7 +2245,7 @@
         function initTvStreams() {
             Object.entries(tvChannels).forEach(([key, ch]) => {
                 if (ch.dmId) {
-                    document.getElementById(ch.iframeId).src = `https://www.dailymotion.com/embed/video/${ch.dmId}?autoplay=1&mute=1`;
+                    document.getElementById(ch.iframeId).src = `https://geo.dailymotion.com/player.html?video=${ch.dmId}&mute=true`;
                 }
             });
             tvLoaded = true;
