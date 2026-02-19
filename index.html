@@ -877,7 +877,7 @@
         .tv-section.collapsed .tv-grid { display: none; }
         .tv-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-top: 12px;
         }
@@ -1253,18 +1253,6 @@
                     <svg class="tv-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
                 </div>
                 <div class="tv-grid">
-                    <div class="tv-card">
-                        <div class="tv-card-header">
-                            <span class="tv-card-name">France 24 FR</span>
-                        </div>
-                        <iframe id="tv-france24fr" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                    </div>
-                    <div class="tv-card">
-                        <div class="tv-card-header">
-                            <span class="tv-card-name">France 24 EN</span>
-                        </div>
-                        <iframe id="tv-france24en" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                    </div>
                     <div class="tv-card">
                         <div class="tv-card-header">
                             <span class="tv-card-name">CNews</span>
@@ -2226,8 +2214,6 @@
         // TV DIRECT
         // ═══════════════════════════════════════════════════════════════
         const tvChannels = {
-            france24fr: { embedUrl: 'https://embed.france24.com/fr/live', iframeId: 'tv-france24fr' },
-            france24en: { embedUrl: 'https://embed.france24.com/en/live', iframeId: 'tv-france24en' },
             cnews:      { dmId: 'x3b68jn', iframeId: 'tv-cnews' },
             franceinfo: { dmId: 'x4rdeu6', iframeId: 'tv-franceinfo' }
         };
@@ -2248,9 +2234,7 @@
 
         function initTvStreams() {
             Object.entries(tvChannels).forEach(([key, ch]) => {
-                if (ch.embedUrl) {
-                    document.getElementById(ch.iframeId).src = ch.embedUrl;
-                } else if (ch.dmId) {
+                if (ch.dmId) {
                     document.getElementById(ch.iframeId).src = `https://www.dailymotion.com/embed/video/${ch.dmId}?autoplay=1&mute=1`;
                 }
             });
