@@ -2259,7 +2259,7 @@
             const ch = tvChannels.lci;
             const video = document.getElementById(ch.videoId);
             try {
-                const res = await fetch(`https://mediainfo.tf1.fr/mediainfocombo/${ch.tf1Api}?context=MYTF1&pver=5015000`);
+                const res = await fetch(`https://mediainfo.tf1.fr/mediainfocombo/${ch.tf1Api}?context=MYTF1&pver=5015000&format=hls`);
                 const data = await res.json();
                 const hlsUrl = data?.delivery?.url;
                 if (!hlsUrl) return;
