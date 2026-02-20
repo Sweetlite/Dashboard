@@ -2319,12 +2319,12 @@
             btn.classList.add('muted');
             btn.innerHTML = svgMuted;
             const channel = tvChannels[ch];
-            if (channel.hlsUrl) {
+            if (channel.videoId) {
                 const video = document.getElementById(channel.videoId);
                 if (video) video.muted = true;
-            } else {
+            } else if (channel.dmId) {
                 const iframe = document.getElementById(channel.iframeId);
-                if (iframe?.contentWindow && channel.dmId) {
+                if (iframe?.contentWindow) {
                     iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [true] }), '*');
                 }
             }
@@ -2337,12 +2337,12 @@
             btn.classList.remove('muted');
             btn.innerHTML = svgSpeaker;
             const channel = tvChannels[ch];
-            if (channel.hlsUrl) {
+            if (channel.videoId) {
                 const video = document.getElementById(channel.videoId);
                 if (video) video.muted = false;
-            } else {
+            } else if (channel.dmId) {
                 const iframe = document.getElementById(channel.iframeId);
-                if (iframe?.contentWindow && channel.dmId) {
+                if (iframe?.contentWindow) {
                     iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [false] }), '*');
                 }
             }
