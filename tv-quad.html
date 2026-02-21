@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Direct - Quad</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; background: #000; overflow: hidden; font-family: Inter, sans-serif; }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            width: 100vw;
+            height: 100vh;
+            gap: 2px;
+            background: #222;
+        }
+        .cell {
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+        .cell iframe, .cell video {
+            width: 100%;
+            height: 100%;
+            border: none;
+            object-fit: contain;
+        }
+        .label {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 4px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .controls {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            z-index: 2;
+            display: flex;
+            gap: 6px;
+        }
+        .ctrl-btn {
+            background: rgba(0,0,0,0.7);
+            border: none;
+            color: #fff;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.2); }
+        .ctrl-btn.active { background: rgba(59,130,246,0.7); }
+    </style>
+</head>
+<body>
+    <div class="grid">
+        <div class="cell">
+            <span class="label">BFM TV</span>
+            <iframe id="bfm" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+            <div class="controls">
+                <button class="ctrl-btn" onclick="toggleSound('bfm')" id="sound-bfm" title="Son">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="cell">
+            <span class="label">LCI</span>
+            <video id="lci" muted playsinline></video>
+            <div class="controls">
+                <button class="ctrl-btn" onclick="toggleSound('lci')" id="sound-lci" title="Son">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="cell">
+            <span class="label">CNews</span>
+            <iframe id="cnews" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+            <div class="controls">
+                <button class="ctrl-btn" onclick="toggleSound('cnews')" id="sound-cnews" title="Son">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="cell">
+            <span class="label">franceinfo</span>
+            <iframe id="franceinfo" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+            <div class="controls">
+                <button class="ctrl-btn" onclick="toggleSound('franceinfo')" id="sound-franceinfo" title="Son">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const svgOn = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08"/></svg>';
+        const svgOff = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+
+        const soundState = { bfm: true, lci: true, cnews: true, franceinfo: true };
+
+        // BFM - Brightcove
+        document.getElementById('bfm').src = 'https://players.brightcove.net/876450610001/19dszYXgm_default/index.html?videoId=6346069778112';
+
+        // CNews & franceinfo - Dailymotion
+        document.getElementById('cnews').src = 'https://geo.dailymotion.com/player.html?video=x3b68jn&mute=true';
+        document.getElementById('franceinfo').src = 'https://geo.dailymotion.com/player.html?video=x4rdeu6&mute=true';
+
+        // LCI - TF1 API + HLS.js
+        let hlsPlayer = null;
+        async function initLci() {
+            try {
+                const res = await fetch('https://mediainfo.tf1.fr/mediainfocombo/L_LCI?context=MYTF1&pver=5015000&format=hls');
+                const data = await res.json();
+                const hlsUrl = data?.delivery?.url;
+                if (!hlsUrl) return;
+                const video = document.getElementById('lci');
+                if (Hls.isSupported()) {
+                    hlsPlayer = new Hls({ maxBufferLength: 10, maxMaxBufferLength: 30 });
+                    hlsPlayer.loadSource(hlsUrl);
+                    hlsPlayer.attachMedia(video);
+                    hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
+                    hlsPlayer.on(Hls.Events.ERROR, (_, d) => {
+                        if (d.fatal && d.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                            setTimeout(() => { hlsPlayer.destroy(); initLci(); }, 2000);
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = hlsUrl;
+                    video.addEventListener('loadedmetadata', () => video.play().catch(() => {}));
+                }
+            } catch (e) {
+                console.error('LCI error:', e);
+            }
+        }
+        initLci();
+
+        function toggleSound(ch) {
+            const wasMuted = soundState[ch];
+            // Mute all others first
+            if (wasMuted) {
+                Object.keys(soundState).forEach(k => {
+                    if (k !== ch && !soundState[k]) muteChannel(k);
+                });
+            }
+            wasMuted ? unmuteChannel(ch) : muteChannel(ch);
+        }
+
+        function muteChannel(ch) {
+            soundState[ch] = true;
+            const btn = document.getElementById('sound-' + ch);
+            btn.innerHTML = svgOff;
+            btn.classList.remove('active');
+            if (ch === 'lci') {
+                document.getElementById('lci').muted = true;
+            } else if (ch === 'cnews' || ch === 'franceinfo') {
+                const iframe = document.getElementById(ch);
+                iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [true] }), '*');
+            }
+        }
+
+        function unmuteChannel(ch) {
+            soundState[ch] = false;
+            const btn = document.getElementById('sound-' + ch);
+            btn.innerHTML = svgOn;
+            btn.classList.add('active');
+            if (ch === 'lci') {
+                document.getElementById('lci').muted = false;
+            } else if (ch === 'cnews' || ch === 'franceinfo') {
+                const iframe = document.getElementById(ch);
+                iframe.contentWindow.postMessage(JSON.stringify({ command: 'muted', parameters: [false] }), '*');
+            }
+        }
+
+        // Fullscreen on F key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'f' || e.key === 'F') {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

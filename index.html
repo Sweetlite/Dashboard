@@ -870,6 +870,19 @@
             animation: tv-pulse 2s ease-in-out infinite;
         }
         @keyframes tv-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .tv-quad-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            padding: 4px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .tv-quad-btn:hover {
+            color: var(--text);
+            background: rgba(255,255,255,0.1);
+        }
         .tv-chevron {
             color: var(--text-muted);
             transition: transform 0.3s;
@@ -1251,7 +1264,12 @@
                         </h2>
                         <span class="tv-live-badge">LIVE</span>
                     </div>
-                    <svg class="tv-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <a href="tv-quad.html" target="_blank" onclick="event.stopPropagation()" class="tv-quad-btn" title="Quad fullscreen">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>
+                        </a>
+                        <svg class="tv-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
                 </div>
                 <div class="tv-grid">
                     <div class="tv-card">
