@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "categories": [
     {
       "id": "productivite",
@@ -13,7 +13,7 @@
         { "name": "Agenda", "url": "https://calendar.google.com", "icon": "https://www.gstatic.com/images/branding/product/2x/calendar_2020q4_48dp.png" },
         { "name": "Notion", "url": "https://notion.so", "icon": "https://www.google.com/s2/favicons?domain=notion.so&sz=64" },
         { "name": "Boursorama", "url": "https://clients.boursobank.com/", "icon": "https://www.google.com/s2/favicons?domain=boursorama.com&sz=64" },
-        { "name": "Trading", "url": "https://tradingboard.boursobank.com/", "icon": "https://www.google.com/s2/favicons?domain=tradingview.com&sz=64" },
+        { "name": "Trading", "url": "https://tradingboard.boursobank.com/", "icon": "https://www.google.com/s2/favicons?domain=boursobank.com&sz=64" },
         { "name": "Raindrop", "url": "https://app.raindrop.io/my/0", "icon": "https://www.google.com/s2/favicons?domain=raindrop.io&sz=64" },
         { "name": "Hostinger", "url": "https://hpanel.hostinger.com/vps/1230871/overview", "icon": "https://www.google.com/s2/favicons?domain=hostinger.com&sz=64" },
         { "name": "GCP", "url": "https://console.cloud.google.com/auth/clients?project=n8nbriefam", "icon": "https://www.gstatic.com/images/branding/product/2x/cloud_64dp.png" },
