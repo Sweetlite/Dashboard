@@ -227,6 +227,24 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .category-title:hover { color: var(--text-secondary); }
+        .category-title:hover svg { stroke: var(--text-secondary); }
+
+        .category-title .chevron {
+            margin-left: auto;
+            transition: transform 0.2s;
+        }
+
+        .category.collapsed .category-title .chevron {
+            transform: rotate(-90deg);
+        }
+
+        .category.collapsed .apps-grid {
+            display: none;
         }
 
         .category-title svg {
@@ -239,6 +257,30 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             gap: 12px;
+        }
+
+        /* Compact category (VSCode projects etc.) */
+        .category-compact .apps-grid {
+            grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+            gap: 8px;
+        }
+        .category-compact .app {
+            padding: 10px 6px;
+            aspect-ratio: auto;
+            min-height: 72px;
+        }
+        .category-compact .app-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+        }
+        .category-compact .app-icon img {
+            width: 22px;
+            height: 22px;
+        }
+        .category-compact .app-name {
+            font-size: 0.6rem;
         }
 
         .app {
@@ -1438,8 +1480,11 @@
             const container = document.getElementById('appCategories');
             if (!appConfig?.categories) return;
 
+            const collapsedCats = JSON.parse(localStorage.getItem('dashboard_collapsed') || '[]');
             container.innerHTML = appConfig.categories.map((cat, catIdx) => {
                 const iconSvg = categoryIcons[cat.icon] || categoryIcons.grid;
+                const isCollapsed = collapsedCats.includes(cat.id);
+                const isCompact = cat.compact;
                 const appsHtml = cat.apps.map((app, appIdx) => `
                     <a href="${app.url}" target="_blank" class="app" data-cat="${catIdx}" data-app="${appIdx}" ${editMode ? 'onclick="editApp(event, ' + catIdx + ', ' + appIdx + ')"' : ''}>
                         <button class="app-delete" onclick="deleteApp(event, ${catIdx}, ${appIdx})" title="Supprimer">&times;</button>
@@ -1449,9 +1494,9 @@
                 `).join('');
 
                 return `
-                    <section class="category">
+                    <section class="category${isCompact ? ' category-compact' : ''}${isCollapsed ? ' collapsed' : ''}" data-cat-id="${cat.id}">
                         <div class="category-header-edit">
-                            <h2 class="category-title" ${editMode ? 'onclick="editCategory(' + catIdx + ')"' : ''}>${iconSvg} ${cat.name}</h2>
+                            <h2 class="category-title" onclick="${editMode ? 'editCategory(' + catIdx + ')' : 'toggleCategory(\'' + cat.id + '\')'}">${iconSvg} ${cat.name} <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></h2>
                             <div class="category-edit-actions">
                                 <button class="cat-btn" onclick="editCategory(${catIdx})" title="Modifier la catégorie">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -1475,6 +1520,16 @@
                     + Ajouter une catégorie
                 </button>
             `;
+        }
+
+        function toggleCategory(catId) {
+            if (editMode) return;
+            const collapsed = JSON.parse(localStorage.getItem('dashboard_collapsed') || '[]');
+            const idx = collapsed.indexOf(catId);
+            if (idx >= 0) collapsed.splice(idx, 1); else collapsed.push(catId);
+            localStorage.setItem('dashboard_collapsed', JSON.stringify(collapsed));
+            const section = document.querySelector(`[data-cat-id="${catId}"]`);
+            if (section) section.classList.toggle('collapsed');
         }
 
         // ═══════════════════════════════════════════════════════════════
