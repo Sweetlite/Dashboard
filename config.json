@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "categories": [
     {
       "id": "productivite",
@@ -62,6 +62,32 @@
       "apps": [
         { "name": "Claude", "url": "https://claude.ai", "icon": "https://www.google.com/s2/favicons?domain=claude.ai&sz=64" },
         { "name": "ChatGPT", "url": "https://chatgpt.com", "icon": "https://www.google.com/s2/favicons?domain=chatgpt.com&sz=64" }
+      ]
+    },
+    {
+      "id": "vscode",
+      "name": "Projets VSCode",
+      "icon": "code",
+      "apps": [
+        { "name": "Dashboard", "url": "vscode://file/Users/jolensa/Documents/GitHub/Dashboard", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "Suits", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/Suits", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "Sketchup", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/Sketchup", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "I_TRADE_IT", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/I_TRADE_IT", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "Dir. Technique", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/Directeur%20technique", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "IA Événementiel", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/ia-evenementiel-expertise", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "Test Eric", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/Test%20Eric", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "MyHomePage", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/MyHomePage", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "MyHome", "url": "vscode://file/Users/jolensa/Documents/GitHub/MyHome", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "FREE_DOCTOLIB", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/FREE_DOCTOLIB", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "Réveil moi", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/R%C3%A9veil%20moi", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "Daily Brief", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/Daily%20Brief", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "FAIR_WAY", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/FAIR_WAY", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "Benchmarker", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/Benchmarker", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "Agent Linkedin", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/Agent%20Linkedin", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "Brief_Moi", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/Brief_Moi", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "I_GOT_IA", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "Vinyles", "url": "vscode://file/Users/jolensa/Library/Mobile%20Documents/com~apple~CloudDocs/I_GOT_IA/Vinyles", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" },
+        { "name": "VSCClaudeCode", "url": "vscode://file/Users/jolensa/Documents/VSCClaudeCode", "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64" }
       ]
     }
   ]
